@@ -1,7 +1,7 @@
 # Личный проект «YetiCave»
 
 * Студент: [Мария Евдокимова](https://up.htmlacademy.ru/php/8/user/867641).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Шумейко](https://htmlacademy.ru/profile/id910113).
 
 ---
 
