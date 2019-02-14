@@ -1,17 +1,6 @@
 <?php
 
-require_once('functions.php');
-require_once('data.php');
-
-function formatting_price($value)
-{
-    $value = ceil($value);
-    if ($value >= 1000){
-        $value = number_format($value, 0, '',' ');
-    }
-    $value .= ' &#8381;';
-    return $value;
-}
+require_once('boot.php');
 
 $page_content = include_template('index.php', [
     'categories' => $categories,
