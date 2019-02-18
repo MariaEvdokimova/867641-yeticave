@@ -31,6 +31,7 @@ FROM
 	LEFT JOIN categories c ON l.id_category = c.id_category
 WHERE
 	l.end_datetime > NOW()
+ORDER BY l.creation_date DESC		
 ;
 
 SELECT l.lot_name, c.category_name
@@ -49,6 +50,6 @@ FROM bet b
 	LEFT JOIN lot l ON l.id_lot = b.id_lot
 WHERE
 	 b.id_lot = 1
-ORDER BY b.sum_bet DESC
+ORDER BY b.creation_date DESC
 LIMIT 2
 ;	
