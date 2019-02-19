@@ -24,27 +24,13 @@
             <nav class="user-menu">
 
                 <!-- здесь должен быть PHP код для показа имени пользователя -->
-                <?php if ($is_auth == 1): ?>
-                    <div class="user-menu__logged">
-                        <p><?=$user_name; ?></p>
-                    </div>
-                <?php else: ?>
-                    <ul class="user-menu__list">
-                        <li class="user-menu__item">
-                            <a href="#">Регистрация</a>
-                        </li>
-                        <li class="user-menu__item">
-                            <a href="#">Вход</a>
-                        </li>
-                    </ul>
-                <?php endif; ?>
 
             </nav>
         </div>
     </header>
 
     <main class="container">
-        <?=$content;?>
+        <p>Ошибка подключения к базе данных</p>
     </main>
 
 </div>
@@ -53,11 +39,6 @@
     <nav class="nav">
         <ul class="nav__list container">
             <!--заполните этот список из массива категорий-->
-            <?php foreach ($categories as $value): ?>
-                <li class="nav__item">
-                    <a href="pages/all-lots.html"><?=$value['category_name'];?></a>
-                </li>
-            <?php endforeach; ?>
         </ul>
     </nav>
     <div class="main-footer__bottom container">
