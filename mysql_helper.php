@@ -1,5 +1,19 @@
 <?php
 
+$link = mysqli_init();
+mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
+
+$link = mysqli_connect("localhost", "root", "", "yeticave");
+mysqli_set_charset($link, "utf8");
+
+if (!$link) {
+    $error = mysqli_connect_error();
+    $layout_content = include_template('error.php', ['error' => $error]);
+
+    print($layout_content);
+    exit(1);
+}
+
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
