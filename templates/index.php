@@ -30,9 +30,7 @@
                             <span class="lot__cost"><?=formatting_price($value['start_price']); ?><!--<b class="rub">р</b>--></span>
                         </div>
                         <div class="lot__timer timer">
-                            <?=lot_timer(date_create("tomorrow midnight")); ?>
-                            <!--lot_timer(date_create($value['end_datetime']))-->
-
+                            <?=lot_timer(date('d.m.Y',strtotime($value['end_datetime']))); ?>
                         </div>
                     </div>
                 </div>

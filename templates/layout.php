@@ -24,9 +24,9 @@
             <nav class="user-menu">
 
                 <!-- здесь должен быть PHP код для показа имени пользователя -->
-                <?php if ($is_auth == 1): ?>
+                <?php if ($user_name['name']): ?>
                     <div class="user-menu__logged">
-                        <p><?=$user_name; ?></p>
+                        <p><?=$user_name['name']; ?></p>
                     </div>
                 <?php else: ?>
                     <ul class="user-menu__list">
