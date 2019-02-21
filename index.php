@@ -10,7 +10,8 @@ $page_content = include_template('index.php', [
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
     'title' => 'Главная',
-    'user_name' => get_user_name($link),
+    'is_auth' => $is_auth,
+    'user_name' => $user_name,
     'categories' => get_categories($link)
 ]);
 
