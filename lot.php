@@ -2,11 +2,11 @@
 
 require_once('boot.php');
 
-$id = mysqli_real_escape_string($link, $_GET['id']);
+$id = intval($_GET['id']);
 
 $page_content = include_template('lot.php', [
-    'categories' => get_categories($link),
-    'lot' => get_lot_by_id($link, $id)
+    'categories' => get_categories(),
+    'lot' => get_lot_by_id($id)
 ]);
 
 $layout_content = include_template('layout.php', [
@@ -14,7 +14,7 @@ $layout_content = include_template('layout.php', [
     'title' => 'Главная',
     'is_auth' => $is_auth,
     'user_name' => $user_name,
-    'categories' => get_categories($link)
+    'categories' => get_categories()
 ]);
 
 print($layout_content);
