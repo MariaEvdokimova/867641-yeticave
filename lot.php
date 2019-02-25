@@ -2,9 +2,11 @@
 
 require_once('boot.php');
 
-$page_content = include_template('index.php', [
+$id = intval($_GET['id']);
+
+$page_content = include_template('lot.php', [
     'categories' => get_categories(),
-    'announcement_list' => get_announcement_list()
+    'lot' => get_lot_by_id($id)
 ]);
 
 $layout_content = include_template('layout.php', [
