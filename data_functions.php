@@ -63,3 +63,8 @@ function get_lot_by_id($id)
         show_error('Ошибка подключения к базе', mysqli_error(get_link()));
     }
 }
+
+function add_lot()
+{
+
+}
