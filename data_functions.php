@@ -64,7 +64,50 @@ function get_lot_by_id($id)
     }
 }
 
-function add_lot()
+function validate_lot(&$lot)
 {
+    $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
+    $errors = [];
 
+    foreach ($required as $key) {
+        if (empty($lot[$key])) {
+            $errors[$key] = 'Это поле надо заполнить';
+        }
+    }
+
+    if (!is_numeric($lot['start_price']) or $lot['start_price'] <= 0) {
+        $errors['start_price'] = 'Это поле надо заполнить';
+    }
+
+    if (!is_numeric($lot['step_bet']) or $lot['step_bet'] <= 0) {
+        $errors['step_bet'] = 'Это поле надо заполнить';
+    }
+
+    $format = 'd.m.Y';
+    $d = DateTime::createFromFormat($format, $lot['lot_date']);
+    if(!($d && $d->format($format) == $lot['lot_date'])){
+        $errors['lot_date'] = 'Это поле надо заполнить';
+    }
+    else{
+        $lot['lot_date'] = $d->format('Y-m-d');
+    }
+
+    if (isset($_FILES['lot_img']['name']) and !empty($_FILES['lot_img']['name'])) {
+        $tmp_name = $_FILES['lot_img']['tmp_name'];
+        $path = $_FILES['lot_img']['name'];
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $file_type = finfo_file($finfo, $tmp_name);
+
+        if ($file_type !== "image/png" AND $file_type !== "image/jpeg" AND $file_type !== "image/jpg") {
+            $errors['lot_img'] = 'Загрузите картинку в формате png, jpeg или jpg.';
+        }
+        else {
+            $filename = uniqid() . '.' . pathinfo($path, PATHINFO_EXTENSION);
+            $lot['img_url'] = $filename;
+            move_uploaded_file($tmp_name, 'img/' . $filename);
+            $lot['img_url'] = 'img/' . $filename;
+        }
+    }
+    return $errors;
 }
