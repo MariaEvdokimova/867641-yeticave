@@ -64,49 +64,53 @@ function get_lot_by_id($id)
     }
 }
 
-function validate_lot(&$lot)
+function validate_text($lot, $required, &$errors)
 {
-    $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
-    $errors = [];
-
     foreach ($required as $key) {
         if (empty($lot[$key])) {
             $errors[$key] = 'Это поле надо заполнить';
         }
     }
+    return $errors;
+}
 
-    if (!is_numeric($lot['start_price']) or $lot['start_price'] <= 0) {
-        $errors['start_price'] = 'Это поле надо заполнить';
+function validate_number($value, $key, &$errors)
+{
+    if (!is_numeric($value) or $value <= 0) {
+        $errors[$key] = 'Это поле целое положительно число';
     }
+    return $errors;
+}
 
-    if (!is_numeric($lot['step_bet']) or $lot['step_bet'] <= 0) {
-        $errors['step_bet'] = 'Это поле надо заполнить';
-    }
-
+function validate_date(&$value, $key, &$errors)
+{
     $format = 'd.m.Y';
-    $d = DateTime::createFromFormat($format, $lot['lot_date']);
-    if(!($d && $d->format($format) == $lot['lot_date'])){
-        $errors['lot_date'] = 'Это поле надо заполнить';
+    $d = DateTime::createFromFormat($format, $value);
+    if (!($d && $d->format($format) == $value)) {
+        $errors[$key] = 'Это поле надо заполнить';
+    } else {
+        $value = $d->format('Y-m-d');
     }
-    else{
-        $lot['lot_date'] = $d->format('Y-m-d');
-    }
+    return $errors;
+}
 
-    if (isset($_FILES['lot_img']['name']) and !empty($_FILES['lot_img']['name'])) {
-        $tmp_name = $_FILES['lot_img']['tmp_name'];
-        $path = $_FILES['lot_img']['name'];
+function validate_file(&$arr, $key, &$errors)
+{
+    if (isset($_FILES[$key]['name']) and !empty($_FILES[$key]['name'])) {
+        $tmp_name = $_FILES[$key]['tmp_name'];
+        $path = $_FILES[$key]['name'];
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $file_type = finfo_file($finfo, $tmp_name);
 
         if ($file_type !== "image/png" AND $file_type !== "image/jpeg" AND $file_type !== "image/jpg") {
-            $errors['lot_img'] = 'Загрузите картинку в формате png, jpeg или jpg.';
+            $errors[$key] = 'Загрузите картинку в формате png, jpeg или jpg.';
         }
         else {
             $filename = uniqid() . '.' . pathinfo($path, PATHINFO_EXTENSION);
-            $lot['img_url'] = $filename;
+            $arr[$key] = $filename;
             move_uploaded_file($tmp_name, 'img/' . $filename);
-            $lot['img_url'] = 'img/' . $filename;
+            $arr[$key] = 'img/' . $filename;
         }
     }
     return $errors;

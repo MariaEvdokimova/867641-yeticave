@@ -4,7 +4,14 @@ require_once('boot.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $lot = $_POST;
-    $errors = validate_lot($lot);
+    $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
+    $errors = [];
+
+    validate_text($lot, $required,$errors);
+    validate_number($lot['start_price'], 'start_price',$errors);
+    validate_number($lot['step_bet'], 'step_bet',$errors);
+    validate_date($lot['lot_date'],'lot_date',$errors);
+    validate_file($lot, 'img_url', $errors);
 
     if (count($errors)) {
         $page_content = include_template('add-lot.php', [

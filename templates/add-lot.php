@@ -43,8 +43,8 @@
         <span class="form__error">Напишите описание лота</span>
       </div>
 
-        <?php $classname = isset($errors['lot_img']) ? "form__item--invalid" : "";
-        $value = isset($lot['lot_img']) ? $lot['lot_img'] : ""; ?>
+        <?php $classname = isset($errors['img_url']) ? "form__item--invalid" : "";
+        $value = isset($lot['img_url']) ? $lot['img_url'] : ""; ?>
       <div class="form__item form__item--file <?=$classname;?>"> <!-- form__item--uploaded -->
           <span class="form__error">Загрузите картинку в формате png, jpeg или jpg.</span>
          <label>Изображение</label>
@@ -55,7 +55,7 @@
           </div>
         </div>
         <div class="form__input-file">
-          <input class="visually-hidden" type="file" id="photo2" src="<?=$value;?>" name="lot_img">
+          <input class="visually-hidden" type="file" id="photo2" src="<?=$value;?>" name="img_url">
           <label for="photo2">
             <span>+ Добавить</span>
           </label>
