@@ -115,3 +115,27 @@ function validate_file(&$arr, $key, &$errors)
     }
     return $errors;
 }
+
+function validate_unique($arr, $key, &$errors, $link)
+{
+    if (empty($errors[$key])) {
+        $unique = mysqli_real_escape_string($link, $arr[$key]);
+        $sql = "SELECT id_user FROM users WHERE email = '$unique'";
+        $res = mysqli_query($link, $sql);
+
+        if (mysqli_num_rows($res) > 0) {
+            $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
+        }
+    }
+    return $errors;
+}
+
+function validate_email($arr, $key, &$errors)
+{
+    if (empty($errors[$key])) {
+         if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
+            $errors[$key] = 'Email должен быть корректным';
+        }
+    }
+    return $errors;
+}

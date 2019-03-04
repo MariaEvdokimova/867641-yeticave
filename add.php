@@ -21,15 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
     }
     else {
+        $img_url = empty($lot['img_url']) ? "" : $lot['img_url'];
         $sql = "INSERT INTO lot (lot_name, description, img_url, start_price, end_datetime, step_bet, id_author, id_category)
             VALUES (?, ?, ?, ?, ?, ?, 1, ?)";
-
         $link = get_link();
-
         $stmt = db_get_prepare_stmt($link, $sql, [
-            $lot['lot_name'], $lot['description'], $lot['img_url'], intval($lot['start_price']), $lot['lot_date'], intval($lot['step_bet']), intval($lot['id_category'])
+            $lot['lot_name'], $lot['description'], $img_url, intval($lot['start_price']), $lot['lot_date'], intval($lot['step_bet']), intval($lot['id_category'])
         ]);
-
         $res = mysqli_stmt_execute($stmt);
 
         if ($res) {
