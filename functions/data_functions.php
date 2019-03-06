@@ -64,14 +64,15 @@ function get_lot_by_id($id)
     }
 }
 
-function validate_text($lot, $required, &$errors)
+function validate_text(&$lot, $required, &$errors)
 {
     foreach ($required as $key) {
         if (empty($lot[$key])) {
             $errors[$key] = 'Это поле надо заполнить';
+        } else {
+            $lot[$key] = htmlspecialchars($lot[$key]);
         }
     }
-    return $errors;
 }
 
 function validate_number($value, $key, &$errors)
@@ -79,26 +80,21 @@ function validate_number($value, $key, &$errors)
     if (!is_numeric($value) or $value <= 0) {
         $errors[$key] = 'Это поле целое положительно число';
     }
-    return $errors;
 }
 
-function validate_date(&$value, $key, &$errors)
+function validate_date($value, $key, &$errors)
 {
     $format = 'd.m.Y';
-    $d = DateTime::createFromFormat($format, $value);
-    if (!($d && $d->format($format) == $value)) {
+    $date = DateTime::createFromFormat($format, $value);
+    if (!($date && $date->format($format) == $value)) {
         $errors[$key] = 'Это поле надо заполнить';
-    } else {
-        $value = $d->format('Y-m-d');
     }
-    return $errors;
 }
 
-function validate_file(&$arr, $key, &$errors)
+function validate_img($key, &$errors)
 {
     if (isset($_FILES[$key]['name']) and !empty($_FILES[$key]['name'])) {
         $tmp_name = $_FILES[$key]['tmp_name'];
-        $path = $_FILES[$key]['name'];
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $file_type = finfo_file($finfo, $tmp_name);
@@ -106,21 +102,61 @@ function validate_file(&$arr, $key, &$errors)
         if ($file_type !== "image/png" AND $file_type !== "image/jpeg" AND $file_type !== "image/jpg") {
             $errors[$key] = 'Загрузите картинку в формате png, jpeg или jpg.';
         }
-        else {
-            $filename = uniqid() . '.' . pathinfo($path, PATHINFO_EXTENSION);
-            $arr[$key] = $filename;
-            move_uploaded_file($tmp_name, 'img/' . $filename);
-            $arr[$key] = 'img/' . $filename;
-        }
+      }
+    else {
+        $errors[$key] = 'Это поле надо заполнить: загрузите картинку.';
     }
-    return $errors;
+}
+
+function create_directory($file_dir)
+{
+    if (!file_exists($file_dir)) {
+        mkdir($file_dir, 0777, true);
+    }
+    return $file_dir;
+}
+
+function change_filename($arr, $key, $file_dir)
+{
+    $tmp_name = $_FILES[$key]['tmp_name'];
+    $path = $_FILES[$key]['name'];
+    $filename = uniqid() . '.' . pathinfo($path, PATHINFO_EXTENSION);
+    $arr[$key] = $filename;
+    move_uploaded_file($tmp_name, $file_dir . '/' . $filename);
+    $arr[$key] = $file_dir . '/' . $filename;
+    return $arr[$key];
+}
+
+function print_mysql_err($link)
+{
+    $page_content = include_template('error.php', ['error' => mysqli_error($link)]);
+    $layout_content = include_template('layout.php', [
+        'content' => $page_content,
+        'title' => 'Ошибка',
+//        'is_auth' => $is_auth,
+//        'user_name' => $user_name,
+        'categories' => get_categories()
+    ]);
+    print($layout_content);
+    die();
+}
+
+function create_lot($arr, $link)
+{
+    $sql = "INSERT INTO lot (lot_name, description, img_url, start_price, end_datetime, step_bet, id_author, id_category)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?)";
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $arr['lot_name'], $arr['description'], $arr['img_url'], intval($arr['start_price']), $arr['lot_date'], intval($arr['step_bet']), intval($arr['id_category'])
+    ]);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
 }
 
 function validate_unique($arr, $key, &$errors, $link)
 {
     if (empty($errors[$key])) {
         $unique = mysqli_real_escape_string($link, $arr[$key]);
-        $sql = "SELECT id_user FROM users WHERE email = '$unique'";
+        $sql = "SELECT id_user FROM users WHERE email = {$unique}";
         $res = mysqli_query($link, $sql);
 
         if (mysqli_num_rows($res) > 0) {
