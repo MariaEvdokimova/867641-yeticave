@@ -116,7 +116,7 @@ function create_directory($file_dir)
     return $file_dir;
 }
 
-function change_filename($arr, $key, $file_dir)
+function change_filename($key, $file_dir)
 {
     $tmp_name = $_FILES[$key]['tmp_name'];
     $path = $_FILES[$key]['name'];
@@ -152,18 +152,11 @@ function create_lot($arr, $link)
     return $res;
 }
 
-function validate_unique($arr, $key, &$errors, $link)
+function get_user_id_by_email($value, $link)
 {
-    if (empty($errors[$key])) {
-        $unique = mysqli_real_escape_string($link, $arr[$key]);
-        $sql = "SELECT id_user FROM users WHERE email = {$unique}";
-        $res = mysqli_query($link, $sql);
-
-        if (mysqli_num_rows($res) > 0) {
-            $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
-        }
-    }
-    return $errors;
+    $sql = "SELECT id_user FROM users WHERE email = '{$value}'";
+    $res = mysqli_query($link, $sql);
+    return $res;
 }
 
 function validate_email($arr, $key, &$errors)
@@ -173,5 +166,14 @@ function validate_email($arr, $key, &$errors)
             $errors[$key] = 'Email должен быть корректным';
         }
     }
-    return $errors;
+}
+
+function create_user($arr, $link)
+{
+    $sql = 'INSERT INTO users (email, name, password, avatar, contacts) VALUES (?, ?, ?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $arr['email'], $arr['name'], $arr['password'], $arr['avatar'], $arr['contacts']
+    ]);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
 }

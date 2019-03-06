@@ -1,17 +1,18 @@
 <?php
 
-require_once('boot.php');
+require_once('../boot.php');
 
-$id = intval($_GET['id']);
-
-$page_content = include_template('lot.php', [
-    'categories' => get_categories(),
-    'lot' => get_lot_by_id($id)
-]);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+}
+else {
+    $page_content = include_template('login.php', [
+        'categories' => get_categories()
+    ]);
+}
 
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
-    'title' => 'Главная',
+    'title' => 'Вход',
     'is_auth' => $is_auth,
     'user_name' => $user_name,
     'categories' => get_categories()

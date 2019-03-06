@@ -1,7 +1,7 @@
 <?php
 
 function include_template($name, $data) {
-    $name = 'templates/' . $name;
+    $name = $_SERVER['DOCUMENT_ROOT'] . '/templates/' . $name;
     $result = '';
 
     if (!is_readable($name)) {

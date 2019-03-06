@@ -1,10 +1,10 @@
 <?php
-require_once('boot.php');
+require_once('../boot.php');
 $id_user = 1;
 $lot = array();
 $errors= array();
 $link = get_link();
-$file_dir = 'uploads/users/id' . $id_user . '/lots';
+$file_dir = '../uploads/users/id' . $id_user . '/lots';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $lot = $_POST;
     $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     validate_img('img_url', $errors);
     if (count($errors) == 0) {
         $file_dir = create_directory($file_dir);
-        $lot['img_url'] = change_filename($lot['img_url'], 'img_url', $file_dir);
+        $lot['img_url'] = change_filename('img_url', $file_dir);
         $date = date_create_from_format('d.m.Y', $lot['lot_date']);
         $lot['lot_date'] = date_format($date, 'Y-m-d');
         $res = create_lot($lot, $link);
