@@ -6,13 +6,16 @@ $id_user = 1;
 $lot = array();
 $errors= array();
 $link = get_link();
+$categories = get_categories();
 $file_dir = 'uploads/users/id' . $id_user . '/lots';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $lot = $_POST;
     $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
 
-    validate_text($lot, $required,$errors);
+    validate_available($lot, $required,$errors);
+    $lot = fix_tags($lot);
+    available_in_array($lot['id_category'], $categories, 'id_category',$errors);
     validate_number($lot['start_price'], 'start_price',$errors);
     validate_number($lot['step_bet'], 'step_bet',$errors);
     validate_date($lot['lot_date'],'lot_date',$errors);
@@ -33,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 $page_content = include_template('add-lot.php', [
-    'categories' => get_categories(),
+    'categories' => $categories,
     'lot' => $lot,
     'errors' => $errors
 ]);
@@ -44,7 +47,7 @@ $layout_content = include_template('layout.php', [
     'title' => 'Добавление нового лота',
     'is_auth' => $is_auth,
     'user_name' => $user_name,
-    'categories' => get_categories()
+    'categories' => $categories
 ]);
 
 print($layout_content);
