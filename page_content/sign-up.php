@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     validate_img('avatar', $errors);
 
     if (empty($errors['email'])) {
-        $res = get_user_id_by_email($sign['email'], $link);
+        $res = get_user_by_email($sign['email'], $link);
         if (mysqli_num_rows($res) > 0) {
             $errors['email'] = 'Пользователь с этим email уже зарегистрирован';
         }

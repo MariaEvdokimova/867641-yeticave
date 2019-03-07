@@ -152,9 +152,10 @@ function create_lot($arr, $link)
     return $res;
 }
 
-function get_user_id_by_email($value, $link)
+function get_user_by_email($value, $link)
 {
-    $sql = "SELECT id_user FROM users WHERE email = '{$value}'";
+    $value = mysqli_real_escape_string($link, $value);
+    $sql = "SELECT * FROM users WHERE email = '{$value}'";
     $res = mysqli_query($link, $sql);
     return $res;
 }
