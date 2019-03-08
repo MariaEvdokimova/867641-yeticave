@@ -184,21 +184,30 @@ function get_user_id_by_email($value, $link)
     return $res;
 }
 
-function validate_email($arr, $key, &$errors)
+function validate_email($arr, $key, &$errors, $res_user)
 {
     if (empty($errors[$key])) {
-         if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
             $errors[$key] = 'Email должен быть корректным';
+        }
+        if (mysqli_num_rows($res_user) > 0) {
+            $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
         }
     }
 }
 
 function create_user($arr, $link)
 {
-    $sql = 'INSERT INTO users (email, name, password, avatar, contacts) VALUES (?, ?, ?, ?, ?)';
+    $sql = 'INSERT INTO users (email, name, password, contacts) VALUES (?, ?, ?, ?)';
     $stmt = db_get_prepare_stmt($link, $sql, [
-        $arr['email'], $arr['name'], $arr['password'], $arr['avatar'], $arr['contacts']
+        $arr['email'], $arr['name'], $arr['password'], $arr['contacts']
     ]);
     $res = mysqli_stmt_execute($stmt);
     return $res;
+}
+
+function update_user_avatar($avatar, $id_user, $link)
+{
+    $sql = "UPDATE users SET avatar = '{$avatar}' WHERE id_user = {$id_user}";
+    mysqli_query($link, $sql);
 }

@@ -1,35 +1,32 @@
 <?php
 
 require_once('../boot.php');
-$id_user = 1;
 $sign = array();
 $errors= array();
 $link = get_link();
-$file_dir = '../uploads/users/id' . $id_user . '/avatar';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sign = $_POST;
     $required = ['email', 'name', 'password', 'contacts'];
 
-    validate_text($sign, $required,$errors);
-    validate_email($sign, 'email', $errors);
+    validate_available($sign, $required,$errors);
+    $sign = fix_tags($sign);
     validate_img('avatar', $errors);
 
-    if (empty($errors['email'])) {
-        $res = get_user_id_by_email($sign['email'], $link);
-        if (mysqli_num_rows($res) > 0) {
-            $errors['email'] = 'Пользователь с этим email уже зарегистрирован';
-        }
-    }
+    $res = get_user_id_by_email($sign['email'], $link);
+    validate_email($sign, 'email', $errors, $res);
 
     if (count($errors) == 0) {
-        if (empty($_FILES['avatar']['name'])) {
-            $sign['avatar'] = "";
-        } else{
-            $file_dir = create_directory($file_dir);
-            $sign['avatar'] = change_filename('avatar', $file_dir);
-        }
         $sign['password'] = password_hash($sign['password'], PASSWORD_DEFAULT);
         $res = create_user($sign, $link);
+
+        if (!empty($_FILES['avatar']['name'])) {
+            $id_user = mysqli_insert_id($link);
+            $file_dir = '../uploads/users/id' . $id_user . '/avatar';
+            $file_dir = create_directory($file_dir);
+            $avatar = change_filename('avatar', $file_dir);
+            update_user_avatar($avatar, $id_user, $link);
+        }
+
         if ($res) {
             header("Location: login.php");
             exit();
