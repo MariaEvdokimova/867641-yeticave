@@ -64,13 +64,38 @@ function get_lot_by_id($id)
     }
 }
 
-function validate_text(&$lot, $required, &$errors)
+function validate_available($lot, $required, &$errors)
 {
     foreach ($required as $key) {
         if (empty($lot[$key])) {
             $errors[$key] = 'Это поле надо заполнить';
-        } else {
-            $lot[$key] = htmlspecialchars($lot[$key]);
+        }
+    }
+}
+
+/**
+ * Преобразует специальные символы в HTML-сущности
+ *
+ * @param $arr array() Массив данных
+ *
+ * @return array() Преобразованный массив
+ */
+function fix_tags($arr)
+{
+    foreach ($arr as $key => $value) {
+        if (!empty($arr[$key])) {
+            $arr[$key] = htmlspecialchars($value);
+        }
+    }
+    return $arr;
+}
+
+function available_in_array($value, $arr, $key, &$errors)
+{
+    if(!empty($value)) {
+        $category_id = array_column($arr, $key);
+        if (!in_array($value, $category_id)) {
+            $errors[$key] = 'Такой категории нет. Выберите категорию из списка.';
         }
     }
 }
@@ -160,21 +185,31 @@ function get_user_by_email($value, $link)
     return $res;
 }
 
-function validate_email($arr, $key, &$errors)
+function validate_email($arr, $key, &$errors, $res_user)
 {
     if (empty($errors[$key])) {
-         if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
             $errors[$key] = 'Email должен быть корректным';
+        }
+        if (mysqli_num_rows($res_user) > 0) {
+            $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
         }
     }
 }
 
 function create_user($arr, $link)
 {
-    $sql = 'INSERT INTO users (email, name, password, avatar, contacts) VALUES (?, ?, ?, ?, ?)';
+    $sql = 'INSERT INTO users (email, name, password, contacts) VALUES (?, ?, ?, ?)';
     $stmt = db_get_prepare_stmt($link, $sql, [
-        $arr['email'], $arr['name'], $arr['password'], $arr['avatar'], $arr['contacts']
+        $arr['email'], $arr['name'], $arr['password'], $arr['contacts']
     ]);
     $res = mysqli_stmt_execute($stmt);
     return $res;
 }
+
+function update_user_avatar($avatar, $id_user, $link)
+{
+    $sql = "UPDATE users SET avatar = '{$avatar}' WHERE id_user = {$id_user}";
+    mysqli_query($link, $sql);
+}
+

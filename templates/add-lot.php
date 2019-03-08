@@ -21,7 +21,7 @@
           <?php $classname = isset($errors['id_category']) ? "form__item--invalid" : "";
             $value = (isset($lot['id_category']) and $lot['id_category'] != '') ? $lot['id_category'] : "";
             $key = array_search($lot['id_category'], array_column($categories, 'id_category'));
-            $category = (isset($lot['id_category']) and $lot['id_category'] != '') ? $categories[$key]['category_name'] : "Выберите категорию";
+            $category = $key ? $categories[$key]['category_name'] : "Выберите категорию";
           ?>
           <div class="form__item <?=$classname;?>">
           <label for="category">Категория</label>
@@ -31,7 +31,7 @@
                   <option value="<?=$value['id_category'] ?>"><?=$value['category_name'];?></option>
               <?php endforeach; ?>
           </select>
-          <span class="form__error">Выберите категорию</span>
+          <span class="form__error"><?=$errors['id_category'];?></span>
         </div>
       </div>
         <?php $classname = isset($errors['description']) ? "form__item--invalid" : "";
