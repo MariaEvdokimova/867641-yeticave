@@ -1,7 +1,6 @@
 <?php
 
 require_once('../boot.php');
-session_start();
 $form = array();
 $errors= array();
 $link = get_link();
@@ -9,23 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $form = $_POST;
     $required = ['email', 'password'];
 
-    validate_text($form, $required,$errors);
+    validate_available($form, $required, $errors);
+    $form = fix_tags($form);
 
     $res = get_user_by_email($form['email'], $link);
-    $user = $res ? mysqli_fetch_array($res, MYSQLI_ASSOC) : null;
+    $user = available_user($res, $form['email'], $errors);
 
     if (count($errors) == 0 and $user) {
-        if (password_verify($form['password'], $user['password'])) {
-            $_SESSION['user'] = $user;
-        }
-        else {
-            $errors['password'] = 'Неверный пароль';
-        }
+        available_password($user, $form['password'], $user['password'], $errors);
     }
-    else {
-        $errors['email'] = 'Такой пользователь не найден';
-    }
-
     if (count($errors) == 0) {
         header("Location: /index.php");
         exit();

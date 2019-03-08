@@ -213,3 +213,20 @@ function update_user_avatar($avatar, $id_user, $link)
     mysqli_query($link, $sql);
 }
 
+function available_user($res, $value, &$errors)
+{
+    $user = $res ? mysqli_fetch_array($res, MYSQLI_ASSOC) : null;
+    if (!empty($value) and !$user) {
+        $errors['email'] = 'Такой пользователь не найден';
+    }
+    return $user;
+}
+
+function available_password($user, $form_pas, $user_pas, &$errors)
+{
+    if (password_verify($form_pas, $user_pas)) {
+        $_SESSION['user'] = $user;
+    } else {
+        $errors['password'] = 'Неверный пароль';
+    }
+}

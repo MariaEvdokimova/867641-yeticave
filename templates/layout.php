@@ -22,12 +22,16 @@
             <a class="main-header__add-lot button" href="/page_content/add.php">Добавить лот</a>
 
             <nav class="user-menu">
-
                 <!-- здесь должен быть PHP код для показа имени пользователя -->
                 <?php if ($is_auth == 1): ?>
-                    <div class="user-menu__logged">
-                        <p><?=$user_name; ?></p>
-                    </div>
+                    <ul class="user-menu__list">
+                        <li class="user-menu__item"> <!--<div class="user-menu__logged">-->
+                            <a href=""><?=$user_name; ?></a>
+                        </li>
+                        <li class="user-menu__item">
+                            <a href="/page_content/logout.php">Выход</a>
+                        </li>
+                    </ul>
                 <?php else: ?>
                     <ul class="user-menu__list">
                         <li class="user-menu__item">
