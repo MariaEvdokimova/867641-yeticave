@@ -42,7 +42,7 @@ function get_announcement_list()
 
 function get_lot_by_id($id)
 {
-    $sql = "SELECT l.id_lot, l.lot_name, l.description, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime
+    $sql = "SELECT l.id_lot, l.lot_name, l.description, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime, l.id_author, l.id_winner
         FROM lot l LEFT JOIN categories c ON l.id_category = c.id_category
         WHERE l.id_lot = '%s' ";
     $sql = sprintf($sql, $id);
@@ -169,9 +169,9 @@ function print_mysql_err($link)
 function create_lot($arr, $link)
 {
     $sql = "INSERT INTO lot (lot_name, description, img_url, start_price, end_datetime, step_bet, id_author, id_category)
-            VALUES (?, ?, ?, ?, ?, ?, 1, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = db_get_prepare_stmt($link, $sql, [
-        $arr['lot_name'], $arr['description'], $arr['img_url'], intval($arr['start_price']), $arr['lot_date'], intval($arr['step_bet']), intval($arr['id_category'])
+        $arr['lot_name'], $arr['description'], $arr['img_url'], intval($arr['start_price']), $arr['lot_date'], intval($arr['step_bet']), $arr['id_author'], intval($arr['id_category'])
     ]);
     $res = mysqli_stmt_execute($stmt);
     return $res;
@@ -228,5 +228,43 @@ function available_password($user, $form_pas, $user_pas, &$errors)
         $_SESSION['user'] = $user;
     } else {
         $errors['password'] = 'Неверный пароль';
+    }
+}
+
+function validate_sum_bet($form_cost, $start_price, $step_bet, &$errors)
+{
+    if(empty($errors['cost']) and $form_cost <= $start_price + $step_bet){
+        $errors['cost'] = 'Значение должно быть больше, чем текущая цена лота + шаг ставки';
+    }
+}
+
+function create_bet_lot($arr, $link)
+{
+    $sql = 'INSERT INTO bet (sum_bet, id_user, id_lot) VALUES (?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $arr['cost'], $arr['id_user'], $arr['id_lot']
+    ]);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
+}
+
+function get_bet_by_lot($value, $link)
+{
+    $value = intval($value);
+    $sql = "SELECT * FROM bet WHERE id_lot = {$value}";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_all($res, MYSQLI_ASSOC);
+
+    return $res;
+}
+
+function user_is_bet($arr, $id_user)
+{
+    foreach ($arr as $value)
+    {
+        if($id_user == $value['id_user']){
+            return 1;
+            break 1;
+        }
     }
 }

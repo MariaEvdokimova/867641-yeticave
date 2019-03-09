@@ -19,7 +19,11 @@
           <p class="lot-item__description"><span><?= $lot['description']; ?></p>
         </div>
         <div class="lot-item__right">
-          <?php if (isset($_SESSION['user'])): ?>
+          <?php if (isset($_SESSION['user'])
+              and $_SESSION['user']['id_user'] !== $lot['id_author']
+              and $lot['end_datetime'] > date('Y-m-d h:i:s')
+              and $user_is_bet !== 1
+          ): ?>
           <div class="lot-item__state">
             <div class="lot-item__timer timer">
                 <?=lot_timer(date('d.m.Y',strtotime($lot['end_datetime']))); ?>
@@ -33,11 +37,13 @@
                 Мин. ставка <span><?= $lot['step_bet']; ?></span>
               </div>
             </div>
-            <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post">
-              <p class="lot-item__form-item form__item form__item--invalid">
+            <form class="lot-item__form" action="/page_content/lot.php?id=<?=$_GET['id']?>" method="post">
+                <?php $classname = isset($errors['cost']) ? "form__item--invalid" : "";
+                $value = $form['cost']; ?>
+              <p class="lot-item__form-item form__item <?=$classname;?>">
                 <label for="cost">Ваша ставка</label>
-                <input id="cost" type="text" name="cost" placeholder="12 000">
-                <span class="form__error">Введите наименование лота</span>
+                <input id="cost" type="text" name="cost" placeholder="12 000" value="<?=$value;?>">
+                <span class="form__error"><?=$errors['cost'];?></span>
               </p>
               <button type="submit" class="button">Сделать ставку</button>
             </form>
