@@ -12,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $form = fix_tags($form);
 
     $res = get_user_by_email($form['email'], $link);
+
+    var_dump($res);
+
     $user = available_user($res, $form['email'], $errors);
 
     if (count($errors) == 0 and $user) {

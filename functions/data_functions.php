@@ -251,7 +251,9 @@ function create_bet_lot($arr, $link)
 function get_bet_by_lot($value, $link)
 {
     $value = intval($value);
-    $sql = "SELECT * FROM bet WHERE id_lot = {$value}";
+    $sql = "SELECT b.*, u.name FROM bet b INNER JOIN users u ON b.id_user = u.id_user 
+            WHERE id_lot = {$value}
+            ORDER BY b.creation_date DESC";
     $res = mysqli_query($link, $sql);
     $res = mysqli_fetch_all($res, MYSQLI_ASSOC);
 
@@ -268,3 +270,49 @@ function user_is_bet($arr, $id_user)
         }
     }
 }
+
+/**
+ * Преобразует дату и время в "человеческом" формате
+ *
+ * @param $arr array() Массив данных
+ * @param $key string Ключ для поля с датой
+ *
+ * @return array() Преобразованный массив
+ */
+function human_timing(&$arr, $key)
+{
+    foreach ($arr as &$value){
+        $time_bet = strtotime($value[$key]);
+        $time = time() - $time_bet;
+        $time = ($time < 60) ? 60 : $time;
+
+        if ($time < 3600){
+            $number_of_units = floor($time / 60);
+            $value[$key] = $number_of_units . ' ' . 'минут назад';
+        }
+        else if ($time < 86400) {
+            $number_of_units = floor($time / 3600);
+            $value[$key] = $number_of_units . ' ' . 'час назад';
+        }
+        else{
+            $value[$key] = date("d.m.y", $time_bet) . ' в ' . date("H:i", $time_bet);
+        }
+    }
+}
+
+/**
+ * Выбирает максимальную ставку по лоту
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $value int идентификатор лота
+ *
+ * @return array() Максимальную ставку и id лота
+ */
+function get_max_bet($link, $value)
+{
+    $value = mysqli_real_escape_string($link, $value);
+    $sql = "SELECT b.id_lot, max(b.sum_bet) as max_bet  FROM bet b WHERE id_lot = {$value} GROUP BY b.id_lot";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_array($res, MYSQLI_ASSOC);
+    return $res;
+ }

@@ -7,10 +7,11 @@ $errors= array();
 $link = get_link();
 $lot = get_lot_by_id($id);
 $id_user = $_SESSION['user']['id_user'];
+$max_bet = get_max_bet($link, $id);
+$history_bet = get_bet_by_lot($lot['id_lot'], $link);
+$user_is_bet = user_is_bet($history_bet, $id_user);
 
-$res_bet = array();
-$res_bet = get_bet_by_lot($lot['id_lot'], $link);
-$user_is_bet = user_is_bet($res_bet, $id_user);
+human_timing($history_bet, 'creation_date');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $form = $_POST;
@@ -37,7 +38,9 @@ $page_content = include_template('lot.php', [
     'lot' => $lot,
     'form' => $form,
     'errors' => $errors,
-    'user_is_bet' => $user_is_bet
+    'user_is_bet' => $user_is_bet,
+    'history_bet' => $history_bet,
+    'max_bet' => $max_bet
 ]);
 
 $layout_content = include_template('layout.php', [
