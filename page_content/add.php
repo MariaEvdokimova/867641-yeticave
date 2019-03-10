@@ -1,22 +1,27 @@
 <?php
 require_once('../boot.php');
-$id_user = 1;
+$categories = get_categories();
+
+if (!isset($_SESSION['user'])) {
+    print_session_err($categories);
+}
+
+$id_user = $_SESSION['user']['id_user'];
 $lot = array();
-$errors= array();
+$errors = array();
 $link = get_link();
 $file_dir = '../uploads/users/id' . $id_user . '/lots';
-$categories = get_categories();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $lot = $_POST;
     $required = ['lot_name', 'description', 'lot_date', 'start_price', 'step_bet', 'id_category'];
 
-    validate_available($lot, $required,$errors);
+    validate_available($lot, $required, $errors);
     $lot = fix_tags($lot);
-    available_in_array($lot['id_category'], $categories, 'id_category',$errors);
-    validate_number($lot['start_price'], 'start_price',$errors);
-    validate_number($lot['step_bet'], 'step_bet',$errors);
-    validate_date($lot['lot_date'],'lot_date',$errors);
+    available_in_array($lot['id_category'], $categories, 'id_category', $errors);
+    validate_number($lot['start_price'], 'start_price', $errors);
+    validate_number($lot['step_bet'], 'step_bet', $errors);
+    validate_date($lot['lot_date'], 'lot_date', $errors);
     validate_img('img_url', $errors);
     validate_str_len($lot['lot_name'], $errors, 'lot_name', 128);
     validate_str_len($lot['description'], $errors, 'description', 300);
@@ -40,6 +45,7 @@ $page_content = include_template('add-lot.php', [
     'lot' => $lot,
     'errors' => $errors
 ]);
+
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
     'title' => 'Добавление нового лота',

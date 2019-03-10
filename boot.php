@@ -1,7 +1,12 @@
 <?php
 
-$is_auth=rand(0,1);
-$user_name = 'Евдокимова Мария';
+session_start();
+$user_name = '';
+$is_auth = 0;
+if (isset($_SESSION['user'])) {
+    $user_name = $_SESSION['user']['name'];
+    $is_auth = 1;
+}
 
 date_default_timezone_set("Europe/Moscow");
 setlocale(LC_ALL, 'ru_RU');
