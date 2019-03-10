@@ -248,16 +248,7 @@ function create_bet_lot($arr, $link)
 function get_bet_by_lot($value, $link)
 {
     $value = intval($value);
-    $sql = "SELECT 
-              b.*, 
-              u.name,
-              CASE 
-                WHEN ROUND(time_to_sec((TIMEDIFF(NOW(), b.creation_date)))) < 3600 
-                    THEN CONCAT(ROUND(time_to_sec((TIMEDIFF(NOW(), b.creation_date))) / 60), ' минут  назад')
-                WHEN ROUND(time_to_sec((TIMEDIFF(NOW(), b.creation_date)))) < 86400 
-                    THEN CONCAT(ROUND(time_to_sec((TIMEDIFF(NOW(), b.creation_date))) / 3600), ' час назад')
-                ELSE DATE_FORMAT(b.creation_date, '%d.%m.%y %H:%i')
-            END as date_bet
+    $sql = "SELECT b.*, u.name
             FROM bet b INNER JOIN users u ON b.id_user = u.id_user 
             WHERE id_lot = {$value}
             ORDER BY b.creation_date DESC";
@@ -274,6 +265,34 @@ function user_is_bet($arr, $id_user)
         if($id_user == $value['id_user']){
             return 1;
             break 1;
+        }
+    }
+}
+
+/**
+ * Преобразует дату и время в "человеческом" формате
+ *
+ * @param $arr array() Массив данных
+ * @param $key string Ключ для поля с датой
+ *
+ * @return array() Преобразованный массив
+ */
+function human_timing(&$arr, $key)
+{
+    foreach ($arr as &$value){
+        $time_bet = strtotime($value[$key]);
+        $time = time() - $time_bet;
+        $time = ($time < 60) ? 60 : $time;
+        if ($time < 3600){
+            $number_of_units = floor($time / 60);
+            $value[$key] = $number_of_units . ' ' . 'минут назад';
+        }
+        else if ($time < 86400) {
+            $number_of_units = floor($time / 3600);
+            $value[$key] = $number_of_units . ' ' . 'час назад';
+        }
+        else{
+            $value[$key] = date("d.m.y", $time_bet) . ' в ' . date("H:i", $time_bet);
         }
     }
 }
