@@ -182,16 +182,17 @@ function get_user_by_email($value, $link)
     $value = mysqli_real_escape_string($link, $value);
     $sql = "SELECT * FROM users WHERE email = '{$value}'";
     $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_array($res, MYSQLI_ASSOC);
     return $res;
 }
 
-function validate_email($arr, $key, &$errors, $res_user)
+function validate_email($arr, $key, &$errors, $link)
 {
     if (empty($errors[$key])) {
         if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
             $errors[$key] = 'Email должен быть корректным';
         }
-        if (mysqli_num_rows($res_user) > 0) {
+        if (get_user_by_email($arr[$key], $link)) {
             $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
         }
     }
@@ -213,20 +214,16 @@ function update_user_avatar($avatar, $id_user, $link)
     mysqli_query($link, $sql);
 }
 
-function available_user($res, $value, &$errors)
+function validate_user($key, $value, &$errors)
 {
-    $user = $res ? mysqli_fetch_array($res, MYSQLI_ASSOC) : null;
-    if (!empty($value) and !$user) {
-        $errors['email'] = 'Такой пользователь не найден';
+    if (empty($errors[$key]) and !$value) {
+        $errors[$key] = 'Такой пользователь не найден';
     }
-    return $user;
 }
 
-function available_password($user, $form_pas, $user_pas, &$errors)
+function available_password($form_pas, $user_pas, &$errors)
 {
-    if (password_verify($form_pas, $user_pas)) {
-        $_SESSION['user'] = $user;
-    } else {
+    if (!password_verify($form_pas, $user_pas)) {
         $errors['password'] = 'Неверный пароль';
     }
 }
@@ -316,3 +313,27 @@ function get_max_bet($link, $value)
     $res = mysqli_fetch_array($res, MYSQLI_ASSOC);
     return $res;
  }
+
+ function validate_str_len($str, &$errors, $key, $len)
+{
+    if (strlen($str) > $len) {
+        $errors[$key] = 'Длинна строки не более ' . $len . ' символов';
+    }
+}
+
+function print_session_err($categories)
+{
+    $page_content = include_template('403.php', [
+        'categories' => $categories
+    ]);
+
+    $layout_content = include_template('layout.php', [
+        'content' => $page_content,
+        'title' => 'Ошибка',
+        'is_auth' => 0,
+        'user_name' => '',
+        'categories' => get_categories()
+    ]);
+    print($layout_content);
+    die();
+}
