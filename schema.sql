@@ -40,6 +40,8 @@ CREATE TABLE lot (
   INDEX lot_category (lot_name, id_category)
 )ENGINE=InnoDB CHARACTER SET=UTF8;
 
+CREATE FULLTEXT INDEX lot_ft_search ON lot(lot_name, description);
+
 CREATE TABLE bet (
   id_bet MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -10,173 +10,28 @@
     </nav>
     <div class="container">
       <section class="lots">
-        <h2>Результаты поиска по запросу «<span>Union</span>»</h2>
+        <h2>Результаты поиска по запросу «<span><?=$search;?></span>»</h2>
         <ul class="lots__list">
+            <?php foreach ($lots as $value): ?>
           <li class="lots__item lot">
             <div class="lot__image">
-              <img src="img/lot-1.jpg" width="350" height="260" alt="Сноуборд">
+              <img src="<?=$value['img_url']; ?>" width="350" height="260" alt="Сноуборд">
             </div>
             <div class="lot__info">
-              <span class="lot__category">Доски и лыжи</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">2014 Rossignol District Snowboard</a></h3>
+              <span class="lot__category"><?=$categories[$value['category_name']]; ?></span>
+              <h3 class="lot__title"><a class="text-link" href="/page_content/lot.php?id=<?=$value['id_lot'];?>"><?=htmlspecialchars($value['lot_name']); ?></a></h3>
               <div class="lot__state">
                 <div class="lot__rate">
                   <span class="lot__amount">Стартовая цена</span>
-                  <span class="lot__cost">10 999<b class="rub">р</b></span>
+                  <span class="lot__cost"><?=formatting_price($value['start_price']); ?></span>
                 </div>
                 <div class="lot__timer timer">
-                  16:54:12
+                    <?=lot_timer(date('d.m.Y',strtotime($value['end_datetime']))); ?>
                 </div>
               </div>
             </div>
           </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-2.jpg" width="350" height="260" alt="Сноуборд">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Доски и лыжи</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">DC Ply Mens 2016/2017 Snowboard</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">12 ставок</span>
-                  <span class="lot__cost">15 999<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer timer--finishing">
-                  00:54:12
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-3.jpg" width="350" height="260" alt="Крепления">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Крепления</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Крепления Union Contact Pro 2015 года размер
-                L/XL</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">7 ставок</span>
-                  <span class="lot__cost">8 000<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer">
-                  10:54:12
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-4.jpg" width="350" height="260" alt="Ботинки">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Ботинки</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Ботинки для сноуборда DC Mutiny Charocal</a>
-              </h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">12 ставок</span>
-                  <span class="lot__cost">10 999<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer timer--finishing">
-                  00:12:03
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-5.jpg" width="350" height="260" alt="Куртка">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Одежда</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Куртка для сноуборда DC Mutiny Charocal</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">12 ставок</span>
-                  <span class="lot__cost">10 999<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer">
-                  00:12:03
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-6.jpg" width="350" height="260" alt="Маска">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Разное</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Маска Oakley Canopy</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">Стартовая цена</span>
-                  <span class="lot__cost">5 500<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer">
-                  07:13:34
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-4.jpg" width="350" height="260" alt="Ботинки">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Ботинки</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Ботинки для сноуборда DC Mutiny Charocal</a>
-              </h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">12 ставок</span>
-                  <span class="lot__cost">10 999<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer timer--finishing">
-                  00:12:03
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-5.jpg" width="350" height="260" alt="Куртка">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Одежда</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Куртка для сноуборда DC Mutiny Charocal</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">12 ставок</span>
-                  <span class="lot__cost">10 999<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer">
-                  00:12:03
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="lots__item lot">
-            <div class="lot__image">
-              <img src="img/lot-6.jpg" width="350" height="260" alt="Маска">
-            </div>
-            <div class="lot__info">
-              <span class="lot__category">Разное</span>
-              <h3 class="lot__title"><a class="text-link" href="lot.html">Маска Oakley Canopy</a></h3>
-              <div class="lot__state">
-                <div class="lot__rate">
-                  <span class="lot__amount">Стартовая цена</span>
-                  <span class="lot__cost">5 500<b class="rub">р</b></span>
-                </div>
-                <div class="lot__timer timer">
-                  07:13:34
-                </div>
-              </div>
-            </div>
-          </li>
+            <?php endforeach; ?>
         </ul>
       </section>
       <ul class="pagination-list">
