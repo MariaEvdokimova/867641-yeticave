@@ -11,13 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     validate_available($form, $required, $errors);
     $form = fix_tags($form);
 
-    $res = get_user_by_email($form['email'], $link);
-    $user = available_user($res, $form['email'], $errors);
+    $user = get_user_by_email($form['email'], $link);
+    validate_user('email', $user,$errors);
 
     if (count($errors) == 0 and $user) {
-        available_password($user, $form['password'], $user['password'], $errors);
+        available_password($form['password'], $user['password'], $errors);
     }
     if (count($errors) == 0) {
+        $_SESSION['user'] = $user;
         header("Location: /index.php");
         exit();
     }
