@@ -11,13 +11,12 @@
     <form class="form form--add-lot container form--invalid" action="add.php" method="post" enctype = "multipart/form-data"> <!-- form--invalid -->
       <h2>Добавление лота</h2>
       <div class="form__container-two">
-
           <?php $classname = isset($errors['lot_name']) ? "form__item--invalid" : "";
           $value = (isset($lot['lot_name']) and $lot['lot_name'] != '') ? $lot['lot_name'] : ""; ?>
         <div class="form__item <?=$classname;?>"> <!-- form__item--invalid -->
             <label for="lot-name">Наименование</label>
           <input id="lot-name" type="text" name="lot_name" placeholder="Введите наименование лота" value="<?=$value;?>"> <!--required-->
-          <span class="form__error">"Введите наименование лота"</span>
+          <span class="form__error"><?=$errors['lot_name'];?></span>
         </div>
           <?php $classname = isset($errors['id_category']) ? "form__item--invalid" : "";
             $value = (isset($lot['id_category']) and $lot['id_category'] != '') ? $lot['id_category'] : "";
@@ -40,9 +39,8 @@
         <div class="form__item form__item--wide <?=$classname;?>">
         <label for="message">Описание</label>
         <textarea id="message" name="description" placeholder="Напишите описание лота"><?=$value;?></textarea> <!--required-->
-        <span class="form__error">Напишите описание лота</span>
+        <span class="form__error"><?=$errors['description'];?></span>
       </div>
-
         <?php $classname = isset($errors['img_url']) ? "form__item--invalid" : "";
         $value = isset($lot['img_url']) ? $lot['img_url'] : ""; ?>
       <div class="form__item form__item--file <?=$classname;?>"> <!-- form__item--uploaded -->
@@ -84,11 +82,9 @@
           <span class="form__error">Введите дату завершения торгов в формате ДД.ММ.ГГГГ</span>
         </div>
       </div>
-
         <?php if (!empty($errors)): ?>
             <span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>
         <?php endif; ?>
-
         <button type="submit" class="button">Добавить лот</button>
     </form>
   </main>

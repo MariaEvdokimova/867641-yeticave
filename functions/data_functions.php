@@ -141,7 +141,7 @@ function create_directory($file_dir)
     return $file_dir;
 }
 
-function change_filename($arr, $key, $file_dir)
+function change_filename($key, $file_dir)
 {
     $tmp_name = $_FILES[$key]['tmp_name'];
     $path = $_FILES[$key]['name'];
@@ -175,4 +175,47 @@ function create_lot($arr, $link)
     ]);
     $res = mysqli_stmt_execute($stmt);
     return $res;
+}
+
+function get_user_id_by_email($value, $link)
+{
+    $sql = "SELECT id_user FROM users WHERE email = '{$value}'";
+    $res = mysqli_query($link, $sql);
+    return $res;
+}
+
+function validate_email($arr, $key, &$errors, $link)
+{
+    $res_user = get_user_id_by_email($arr[$key], $link);
+    if (empty($errors[$key])) {
+        if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
+            $errors[$key] = 'Email должен быть корректным';
+        }
+        if (mysqli_num_rows($res_user) > 0) {
+            $errors[$key] = 'Пользователь с этим email уже зарегистрирован';
+        }
+    }
+}
+
+function create_user($arr, $link)
+{
+    $sql = 'INSERT INTO users (email, name, password, contacts) VALUES (?, ?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $arr['email'], $arr['name'], $arr['password'], $arr['contacts']
+    ]);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
+}
+
+function update_user_avatar($avatar, $id_user, $link)
+{
+    $sql = "UPDATE users SET avatar = '{$avatar}' WHERE id_user = {$id_user}";
+    mysqli_query($link, $sql);
+}
+
+function validate_str_len($str, &$errors, $key, $len)
+{
+    if (strlen($str) > $len) {
+        $errors[$key] = 'Длинна строки не более ' . $len . ' символов';
+    }
 }
