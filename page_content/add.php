@@ -20,6 +20,8 @@ if (isset($_SESSION['user'])) {
         validate_number($lot['step_bet'], 'step_bet', $errors);
         validate_date($lot['lot_date'], 'lot_date', $errors);
         validate_img('img_url', $errors);
+        validate_str_len($lot['lot_name'], $errors, 'lot_name', 128);
+        validate_str_len($lot['description'], $errors, 'description', 65535);
         if (count($errors) == 0) {
             $file_dir = create_directory($file_dir);
             $lot['img_url'] = change_filename('img_url', $file_dir);

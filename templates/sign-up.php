@@ -29,14 +29,14 @@
       <div class="form__item <?=$classname;?>">
         <label for="name">Имя*</label>
         <input id="name" type="text" name="name" placeholder="Введите имя" value="<?=$value;?>">
-        <span class="form__error">Введите имя</span>
+        <span class="form__error"><?=$errors['name'];?></span>
       </div>
         <?php $classname = isset($errors['contacts']) ? "form__item--invalid" : "";
         $value = (isset($sign['contacts']) and $sign['contacts'] != '') ? $sign['contacts'] : ""; ?>
       <div class="form__item <?=$classname;?>">
         <label for="message">Контактные данные*</label>
         <textarea id="message" name="contacts" placeholder="Напишите как с вами связаться"><?=$value;?></textarea>
-        <span class="form__error">Напишите как с вами связаться</span>
+        <span class="form__error"><?=$errors['contacts'];?></span>
       </div>
         <?php $classname = isset($errors['avatar']) ? "form__item--invalid" : "";
         $value = isset($sign['avatar']) ? $sign['avatar'] : ""; ?>
