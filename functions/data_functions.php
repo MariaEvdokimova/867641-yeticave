@@ -184,8 +184,9 @@ function get_user_id_by_email($value, $link)
     return $res;
 }
 
-function validate_email($arr, $key, &$errors, $res_user)
+function validate_email($arr, $key, &$errors, $link)
 {
+    $res_user = get_user_id_by_email($arr[$key], $link);
     if (empty($errors[$key])) {
         if (!filter_var($arr[$key], FILTER_VALIDATE_EMAIL)) {
             $errors[$key] = 'Email должен быть корректным';
@@ -210,4 +211,11 @@ function update_user_avatar($avatar, $id_user, $link)
 {
     $sql = "UPDATE users SET avatar = '{$avatar}' WHERE id_user = {$id_user}";
     mysqli_query($link, $sql);
+}
+
+function validate_str_len($str, &$errors, $key, $len)
+{
+    if (strlen($str) > $len) {
+        $errors[$key] = 'Длинна строки не более ' . $len . ' символов';
+    }
 }

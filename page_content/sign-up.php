@@ -11,23 +11,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     validate_available($sign, $required,$errors);
     $sign = fix_tags($sign);
     validate_img('avatar', $errors);
-
-    $res = get_user_id_by_email($sign['email'], $link);
-    validate_email($sign, 'email', $errors, $res);
+    validate_email($sign, 'email', $errors, $link);
+    validate_str_len($sign['name'], $errors, 'name', 128);
+    validate_str_len($sign['contacts'], $errors, 'contacts', 65535);
 
     if (count($errors) == 0) {
         $sign['password'] = password_hash($sign['password'], PASSWORD_DEFAULT);
         $res = create_user($sign, $link);
 
-        if (!empty($_FILES['avatar']['name'])) {
-            $id_user = mysqli_insert_id($link);
-            $file_dir = '../uploads/users/id' . $id_user . '/avatar';
-            $file_dir = create_directory($file_dir);
-            $avatar = change_filename('avatar', $file_dir);
-            update_user_avatar($avatar, $id_user, $link);
-        }
-
         if ($res) {
+            if (!empty($_FILES['avatar']['name'])) {
+                $id_user = mysqli_insert_id($link);
+                $file_dir = '../uploads/users/id' . $id_user . '/avatar';
+                $file_dir = create_directory($file_dir);
+                $avatar = change_filename('avatar', $file_dir);
+                update_user_avatar($avatar, $id_user, $link);
+            }
+
             header("Location: login.php");
             exit();
         }else {
