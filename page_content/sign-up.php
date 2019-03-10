@@ -15,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     validate_str_len($sign['name'], $errors, 'name', 128);
     validate_str_len($sign['contacts'], $errors, 'contacts', 300);
 
-
     if (count($errors) == 0) {
         $sign['password'] = password_hash($sign['password'], PASSWORD_DEFAULT);
         $res = create_user($sign, $link);
