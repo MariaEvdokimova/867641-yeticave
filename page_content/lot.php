@@ -10,6 +10,7 @@ $id_user = $_SESSION['user']['id_user'];
 $max_bet = get_max_bet($link, $id);
 $history_bet = get_bet_by_lot($lot['id_lot'], $link);
 $user_is_bet = user_is_bet($history_bet, $id_user);
+human_timing($history_bet, 'creation_date');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $form = $_POST;

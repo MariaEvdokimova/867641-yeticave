@@ -22,7 +22,7 @@
           <?php if (isset($_SESSION['user'])
               and $_SESSION['user']['id_user'] !== $lot['id_author']
               and $lot['end_datetime'] > date('Y-m-d h:i:s')
-              and $user_is_bet !== 1
+              and $user_is_bet === false
           ): ?>
           <div class="lot-item__state">
             <div class="lot-item__timer timer">
@@ -56,7 +56,7 @@
                     <tr class="history__item">
                         <td class="history__name"><?=$value['name'];?></td>
                         <td class="history__price"><?=formatting_price($value['sum_bet']);?></td>
-                        <td class="history__time"><?=$value['date_bet'];?></td>
+                        <td class="history__time"><?=$value['creation_date'];?></td>
                     </tr>
                 <?php endforeach; ?>
             </table>
