@@ -263,10 +263,10 @@ function user_is_bet($arr, $id_user)
     foreach ($arr as $value)
     {
         if($id_user == $value['id_user']){
-            return 1;
-            break 1;
+            return true;
         }
     }
+    return false;
 }
 
 /**

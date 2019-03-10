@@ -22,7 +22,7 @@
           <?php if (isset($_SESSION['user'])
               and $_SESSION['user']['id_user'] !== $lot['id_author']
               and $lot['end_datetime'] > date('Y-m-d h:i:s')
-              and $user_is_bet !== 1
+              and $user_is_bet === false
           ): ?>
           <div class="lot-item__state">
             <div class="lot-item__timer timer">
