@@ -42,7 +42,7 @@ function get_announcement_list()
 
 function get_lot_by_id($id)
 {
-    $sql = "SELECT l.id_lot, l.lot_name, l.description, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime
+    $sql = "SELECT l.id_lot, l.lot_name, l.description, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime, l.id_author, l.id_winner
         FROM lot l LEFT JOIN categories c ON l.id_category = c.id_category
         WHERE l.id_lot = '%s' ";
     $sql = sprintf($sql, $id);
@@ -169,9 +169,9 @@ function print_mysql_err($link)
 function create_lot($arr, $link)
 {
     $sql = "INSERT INTO lot (lot_name, description, img_url, start_price, end_datetime, step_bet, id_author, id_category)
-            VALUES (?, ?, ?, ?, ?, ?, 1, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = db_get_prepare_stmt($link, $sql, [
-        $arr['lot_name'], $arr['description'], $arr['img_url'], intval($arr['start_price']), $arr['lot_date'], intval($arr['step_bet']), intval($arr['id_category'])
+        $arr['lot_name'], $arr['description'], $arr['img_url'], intval($arr['start_price']), $arr['lot_date'], intval($arr['step_bet']), $arr['id_author'], intval($arr['id_category'])
     ]);
     $res = mysqli_stmt_execute($stmt);
     return $res;
@@ -228,7 +228,93 @@ function available_password($form_pas, $user_pas, &$errors)
     }
 }
 
-function validate_str_len($str, &$errors, $key, $len)
+function validate_sum_bet($form_cost, $start_price, $step_bet, &$errors)
+{
+    if(empty($errors['cost']) and $form_cost <= $start_price + $step_bet){
+        $errors['cost'] = 'Значение должно быть больше, чем текущая цена лота + шаг ставки';
+    }
+}
+
+function create_bet_lot($arr, $link)
+{
+    $sql = 'INSERT INTO bet (sum_bet, id_user, id_lot) VALUES (?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $arr['cost'], $arr['id_user'], $arr['id_lot']
+    ]);
+    $res = mysqli_stmt_execute($stmt);
+    return $res;
+}
+
+function get_bet_by_lot($value, $link)
+{
+    $value = intval($value);
+    $sql = "SELECT b.*, u.name
+            FROM bet b INNER JOIN users u ON b.id_user = u.id_user 
+            WHERE id_lot = {$value}
+            ORDER BY b.creation_date DESC";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_all($res, MYSQLI_ASSOC);
+
+    return $res;
+}
+
+function user_is_bet($arr, $id_user)
+{
+    foreach ($arr as $value)
+    {
+        if($id_user == $value['id_user']){
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Преобразует дату и время в "человеческом" формате
+ *
+ * @param $arr array() Массив данных
+ * @param $key string Ключ для поля с датой
+ *
+ * @return array() Преобразованный массив
+ */
+function human_timing(&$arr, $key)
+{
+    foreach ($arr as &$value){
+        $time_bet = strtotime($value[$key]);
+        $time = time() - $time_bet;
+        $time = ($time < 60) ? 60 : $time;
+        if ($time < 3600){
+            $number_of_units = floor($time / 60);
+            $value[$key] = $number_of_units . ' ' . 'минут назад';
+        }
+        else if ($time < 86400) {
+            $number_of_units = floor($time / 3600);
+            $value[$key] = $number_of_units . ' ' . 'час назад';
+        }
+        else{
+            $value[$key] = date("d.m.y", $time_bet) . ' в ' . date("H:i", $time_bet);
+        }
+    }
+}
+
+/**
+ * Выбирает максимальную ставку по лоту
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $value int идентификатор лота
+ *
+ * @return array() Максимальную ставку и id лота
+ */
+function get_max_bet($link, $value)
+{
+    $value = mysqli_real_escape_string($link, $value);
+    $sql = "SELECT b.id_lot, max(b.sum_bet) as max_bet  FROM bet b WHERE id_lot = {$value} GROUP BY b.id_lot";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_array($res, MYSQLI_ASSOC);
+    return $res;
+ }
+
+ function validate_str_len($str, &$errors, $key, $len)
 {
     if (strlen($str) > $len) {
         $errors[$key] = 'Длинна строки не более ' . $len . ' символов';
