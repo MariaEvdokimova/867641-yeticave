@@ -4,7 +4,7 @@ require_once('../boot.php');
 
 $link = get_link();
 $lots = array();
-$search = htmlspecialchars($_GET['search']);
+$search = htmlspecialchars(trim($_GET['search']));
 
 if ($search) {
     $lots = lots_search($link, $search);
