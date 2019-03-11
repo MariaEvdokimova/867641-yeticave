@@ -10,7 +10,8 @@
     </nav>
     <div class="container">
       <section class="lots">
-        <h2>Результаты поиска по запросу «<span><?=$search;?></span>»</h2>
+          <?php $res = empty($lots) ? 'Ничего не найдено по вашему запросу' : 'Результаты поиска по запросу'; ?>
+        <h2><?=$res;?> «<span><?=$search;?></span>»</h2>
         <ul class="lots__list">
             <?php foreach ($lots as $value): ?>
           <li class="lots__item lot">
