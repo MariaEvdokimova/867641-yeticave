@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $lot['img_url'] = change_filename('img_url', $file_dir);
         $date = date_create_from_format('d.m.Y', $lot['lot_date']);
         $lot['lot_date'] = date_format($date, 'Y-m-d');
+        $lot['id_author'] = $id_user;
         $res = create_lot($lot, $link);
         if ($res) {
             $id_lot = mysqli_insert_id($link);

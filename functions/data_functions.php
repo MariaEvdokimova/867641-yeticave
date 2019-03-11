@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Создает ресурс соединения с базой данных, если не успешно,
+ * то перенаправляет на страницу с ошибкой
+*/
 function get_link()
 {
     $link = mysqli_init();
@@ -20,6 +24,11 @@ function get_link()
     }
 }
 
+/**
+ * Получает данные о категориях
+ *
+ * @return array массив данных категорий
+ */
 function get_categories()
 {
     $sql = 'SELECT id_category, category_name FROM categories ORDER BY id_category';
@@ -29,6 +38,11 @@ function get_categories()
     return $categories;
 }
 
+/**
+ * Получает данные о лотах
+ *
+ * @return array() массив данных лотов
+ */
 function get_announcement_list()
 {
     $sql = 'SELECT l.id_lot, l.lot_name, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime
@@ -40,6 +54,13 @@ function get_announcement_list()
     return $announcement_list;
 }
 
+/**
+ * Получает данные о лоте по его идентификатору
+ *
+ * @param $id int идентификатор лота
+ *
+ * @return array() массив данных по конкретному лот или ошибка
+ */
 function get_lot_by_id($id)
 {
     $sql = "SELECT l.id_lot, l.lot_name, l.description, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime, l.id_author, l.id_winner
@@ -64,6 +85,14 @@ function get_lot_by_id($id)
     }
 }
 
+/**
+ * Проверяет, заполнено ли поле,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $lot array массив данных
+ * @param $required array массив названий полей, которые нужно проверить
+ * @param $errors array() массив ошибок
+ */
 function validate_available($lot, $required, &$errors)
 {
     foreach ($required as $key) {
@@ -90,6 +119,15 @@ function fix_tags($arr)
     return $arr;
 }
 
+/**
+ * Проверяет, что выбрана категория из списка,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $value int проверяемое значение
+ * @param $arr array массив данных с категориями
+ * @param $key string ключ, Для записи ошибки
+ * @param $errors array() массив ошибок
+ */
 function available_in_array($value, $arr, $key, &$errors)
 {
     if(!empty($value)) {
@@ -100,6 +138,14 @@ function available_in_array($value, $arr, $key, &$errors)
     }
 }
 
+/**
+ * Проверяет, что поле целое положительно число,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $value int проверяемое значение
+ * @param $key string ключ, Для записи ошибки
+ * @param $errors array() массив ошибок
+ */
 function validate_number($value, $key, &$errors)
 {
     if (!is_numeric($value) or $value <= 0) {
@@ -107,15 +153,30 @@ function validate_number($value, $key, &$errors)
     }
 }
 
+/**
+ * Проверяет, что формат даты 'd.m.Y',
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $value string значение поля дата
+ * @param $key string ключ, имя поля дата
+ * @param $errors array() массив ошибок
+ */
 function validate_date($value, $key, &$errors)
 {
     $format = 'd.m.Y';
     $date = DateTime::createFromFormat($format, $value);
     if (!($date && $date->format($format) == $value)) {
-        $errors[$key] = 'Это поле надо заполнить';
+        $errors[$key] = 'Это поле надо заполнить в формате d.m.Y';
     }
 }
 
+/**
+ * Проверяет, что загрузили действительно картинку в формате png, jpeg или jpg,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $key string ключ, имя поля с загруженным файлом
+ * @param $errors array() массив ошибок
+ */
 function validate_img($key, &$errors)
 {
     if (isset($_FILES[$key]['name']) and !empty($_FILES[$key]['name'])) {
@@ -133,6 +194,13 @@ function validate_img($key, &$errors)
     }
 }
 
+/**
+ * Создает дирректорию, если такой нет
+ *
+ * @param $file_dir string дирректоря
+ *
+ * @return string возвращает дирректорию
+ */
 function create_directory($file_dir)
 {
     if (!file_exists($file_dir)) {
@@ -141,6 +209,14 @@ function create_directory($file_dir)
     return $file_dir;
 }
 
+/**
+ * Меняет имя файла на набор уникальных символов
+ *
+ * @param $key string ключ, имя поля с выбранным файлом
+ * @param $file_dir string дирректоряи
+ *
+ * @return array возвращает имя файла и его путь в виде элемента массива
+ */
 function change_filename($key, $file_dir)
 {
     $tmp_name = $_FILES[$key]['tmp_name'];
@@ -152,6 +228,12 @@ function change_filename($key, $file_dir)
     return $arr[$key];
 }
 
+/**
+ * Переводит на страницу с ошибкой
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ */
 function print_mysql_err($link)
 {
     $page_content = include_template('error.php', ['error' => mysqli_error($link)]);
@@ -166,6 +248,14 @@ function print_mysql_err($link)
     die();
 }
 
+/**
+ * Добавляет новый лот в базу
+ *
+ * @param $arr array массив данных о новом лоте
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return bool TRUE в случае успешного завершения или FALSE в случае ошибки
+ */
 function create_lot($arr, $link)
 {
     $sql = "INSERT INTO lot (lot_name, description, img_url, start_price, end_datetime, step_bet, id_author, id_category)
@@ -177,6 +267,14 @@ function create_lot($arr, $link)
     return $res;
 }
 
+/**
+ * Получает данные о пользователе по email
+ *
+ * @param $value string введеный email
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array() массив данных о пользователе
+ */
 function get_user_by_email($value, $link)
 {
     $value = mysqli_real_escape_string($link, $value);
@@ -186,6 +284,15 @@ function get_user_by_email($value, $link)
     return $res;
 }
 
+/**
+ * Проверяет, что правильно ввели новый email, если нет
+ * то записывает ошибуку в массив ошибок
+ *
+ * @param $arr array массив данных
+ * @param $key string ключ поля где хранится email
+ * @param $errors array() массив ошибок
+ * @param $link mysqli Ресурс соединения
+ */
 function validate_email($arr, $key, &$errors, $link)
 {
     if (empty($errors[$key])) {
@@ -198,6 +305,14 @@ function validate_email($arr, $key, &$errors, $link)
     }
 }
 
+/**
+ * Добавляет нового пользователя в базу
+ *
+ * @param $arr array массив данных о новом пользователе
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return bool TRUE в случае успешного завершения или FALSE в случае ошибки
+ */
 function create_user($arr, $link)
 {
     $sql = 'INSERT INTO users (email, name, password, contacts) VALUES (?, ?, ?, ?)';
@@ -208,12 +323,27 @@ function create_user($arr, $link)
     return $res;
 }
 
+/**
+ * Обнавляет данные аватара пользователя в базе
+ *
+ * @param $avatar string значение пути и имени файла аватара
+ * @param $id_user int идентификатор пользователя
+ * @param $link mysqli Ресурс соединения
+ */
 function update_user_avatar($avatar, $id_user, $link)
 {
     $sql = "UPDATE users SET avatar = '{$avatar}' WHERE id_user = {$id_user}";
     mysqli_query($link, $sql);
 }
 
+/**
+ * Проверяет, есть ли данные о пользователе, если нет
+ * то записывает ошибуку в массив ошибок
+ *
+ * @param $key string ключ для записи ошибки
+ * @param $value string значение пользователя
+ * @param $errors array() массив ошибок
+ */
 function validate_user($key, $value, &$errors)
 {
     if (empty($errors[$key]) and !$value) {
@@ -221,6 +351,14 @@ function validate_user($key, $value, &$errors)
     }
 }
 
+/**
+ * Проверяет, хеши паролей, если не совпадают
+ * то записывает ошибуку в массив ошибок
+ *
+ * @param $form_pas string хеш пароля, который ввел пользователь
+ * @param $user_pas string хеш пароля из базы
+ * @param $errors array() массив ошибок
+ */
 function available_password($form_pas, $user_pas, &$errors)
 {
     if (!password_verify($form_pas, $user_pas)) {
@@ -228,6 +366,15 @@ function available_password($form_pas, $user_pas, &$errors)
     }
 }
 
+/**
+ * Проверяет, если введенное значение меньше или равно, чем текущая цена лота + шаг ставки,
+ * то записывает ошибуку в массив ошибок
+ *
+ * @param $form_cost int введеная значение
+ * @param $start_price int начальная цена
+ * @param $step_bet int ставка
+ * @param $errors array() массив ошибок
+ */
 function validate_sum_bet($form_cost, $start_price, $step_bet, &$errors)
 {
     if(empty($errors['cost']) and $form_cost <= $start_price + $step_bet){
@@ -235,6 +382,14 @@ function validate_sum_bet($form_cost, $start_price, $step_bet, &$errors)
     }
 }
 
+/**
+ * Добавляет ставку в таблицу ставок
+ *
+ * @param $arr array() информация о ставке
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return bool TRUE в случае успешного завершения или FALSE в случае ошибки
+ */
 function create_bet_lot($arr, $link)
 {
     $sql = 'INSERT INTO bet (sum_bet, id_user, id_lot) VALUES (?, ?, ?)';
@@ -245,6 +400,14 @@ function create_bet_lot($arr, $link)
     return $res;
 }
 
+/**
+ * Получает список ставок по лоту
+ *
+ * @param $value int идентификатор лота
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array() список ставок
+ */
 function get_bet_by_lot($value, $link)
 {
     $value = intval($value);
@@ -258,6 +421,14 @@ function get_bet_by_lot($value, $link)
     return $res;
 }
 
+/**
+ * Проверят есть ли пользователь в массиве.
+ *
+ * @param $arr array() массив данных
+ * @param $id_user string идентификатор пользователя
+ *
+ * @return bool Если пользователь найден true, иначе false
+ */
 function user_is_bet($arr, $id_user)
 {
     foreach ($arr as $value)
@@ -275,7 +446,6 @@ function user_is_bet($arr, $id_user)
  * @param $arr array() Массив данных
  * @param $key string Ключ для поля с датой
  *
- * @return array() Преобразованный массив
  */
 function human_timing(&$arr, $key)
 {
@@ -314,6 +484,14 @@ function get_max_bet($link, $value)
     return $res;
  }
 
+/**
+ * Проверят длинну вводимых символов, если больше, то записывает ошибку.
+ *
+ * @param $str string введеная строка
+ * @param $errors array() массив ошибок
+ * @param $key string ключ поля, по которому проверяем
+ * @param $len int кличество символов
+ */
  function validate_str_len($str, &$errors, $key, $len)
 {
     if (strlen($str) > $len) {
@@ -321,6 +499,12 @@ function get_max_bet($link, $value)
     }
 }
 
+/**
+ * Переводит на страницу с ошибкой, если у пользователя нет прав для доступа
+ * к запрашиваемой информации.
+ *
+ * @param $categories array() список категорий
+ */
 function print_session_err($categories)
 {
     $page_content = include_template('403.php', [
@@ -336,4 +520,44 @@ function print_session_err($categories)
     ]);
     print($layout_content);
     die();
+}
+
+/**
+ * Поиск по названию  описанию из таблици лотов.
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $search string данные из поля поиска
+ * @param $page_items int количество лотов на странице
+ * @param $offset int указатель с какого момента считывать данные из базы
+ *
+ * @return array() найденные лоты по запросу
+ */
+function lots_search($link, $search, $page_items, $offset)
+{
+    $sql = "SELECT l.id_lot, l.lot_name, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime FROM lot l
+            JOIN categories c ON c.id_category = l.id_category
+            WHERE MATCH(l.lot_name, l.description) AGAINST(?) AND l.end_datetime > NOW()
+            ORDER BY l.creation_date DESC
+            LIMIT {$page_items} OFFSET {$offset}";
+    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $res = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    return $res;
+}
+
+/**
+ * Получает количество актуальных лотов.
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return int количество лотов
+ */
+function get_count_lots($link)
+{
+    $result = mysqli_query($link, "SELECT COUNT(*) as cnt FROM lot WHERE end_datetime > NOW()");
+    $items_count = mysqli_fetch_assoc($result)['cnt'];
+
+    return $items_count;
 }
