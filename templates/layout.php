@@ -15,9 +15,13 @@
             <a class="main-header__logo" href="/index.php">
                 <img src="/img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
             </a>
+            <?php $classname = isset($errors['search']) ? "form__item--invalid" : ""; ?>
             <form class="main-header__search" method="get" action="/page_content/search.php">
-                <input type="search" name="search" placeholder="Поиск лота">
-                <input class="main-header__search-btn" type="submit" name="find" value="Найти">
+                <div class="<?=$classname;?>">
+                    <input type="search" name="search" placeholder="Поиск лота">
+                    <input class="main-header__search-btn" type="submit" name="find" value="Найти">
+                    <span class="form__error"><?=$errors['search'];?></span>
+                </div>
             </form>
             <a class="main-header__add-lot button" href="/page_content/add.php">Добавить лот</a>
             <nav class="user-menu">

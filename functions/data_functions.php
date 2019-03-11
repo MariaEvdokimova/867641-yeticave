@@ -3,9 +3,7 @@
 /**
  * Создает ресурс соединения с базой данных, если не успешно,
  * то перенаправляет на страницу с ошибкой
- *
- * @return object ресурс соединения
- */
+*/
 function get_link()
 {
     $link = mysqli_init();
@@ -29,7 +27,7 @@ function get_link()
 /**
  * Получает данные о категориях
  *
- * @return array() массив данных категорий
+ * @return array массив данных категорий
  */
 function get_categories()
 {
@@ -505,7 +503,7 @@ function get_max_bet($link, $value)
  * Переводит на страницу с ошибкой, если у пользователя нет прав для доступа
  * к запрашиваемой информации.
  *
- * @param $categories string список категорий
+ * @param $categories array() список категорий
  */
 function print_session_err($categories)
 {
@@ -529,18 +527,37 @@ function print_session_err($categories)
  *
  * @param $link mysqli Ресурс соединения
  * @param $search string данные из поля поиска
+ * @param $page_items int количество лотов на странице
+ * @param $offset int указатель с какого момента считывать данные из базы
  *
  * @return array() найденные лоты по запросу
  */
-function lots_search($link, $search)
+function lots_search($link, $search, $page_items, $offset)
 {
     $sql = "SELECT l.id_lot, l.lot_name, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime FROM lot l
             JOIN categories c ON c.id_category = l.id_category
-            WHERE MATCH(l.lot_name, l.description) AGAINST(?)";
+            WHERE MATCH(l.lot_name, l.description) AGAINST(?) AND l.end_datetime > NOW()
+            ORDER BY l.creation_date DESC
+            LIMIT {$page_items} OFFSET {$offset}";
     $stmt = db_get_prepare_stmt($link, $sql, [$search]);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $res = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     return $res;
+}
+
+/**
+ * Получает количество актуальных лотов.
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return int количество лотов
+ */
+function get_count_lots($link)
+{
+    $result = mysqli_query($link, "SELECT COUNT(*) as cnt FROM lot WHERE end_datetime > NOW()");
+    $items_count = mysqli_fetch_assoc($result)['cnt'];
+
+    return $items_count;
 }
