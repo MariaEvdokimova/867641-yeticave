@@ -14,7 +14,7 @@ validate_str_len($search,$errors, 'search', 200);
 
 if ($search and count($errors) == 0) {
     $cur_page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-    $page_items = 3;//9;
+    $page_items = 9;
 
     $items_count = get_count_lots($link);
 
@@ -24,7 +24,7 @@ if ($search and count($errors) == 0) {
     $pages = range(1, $pages_count);
 
     $lots = lots_search($link, $search, $page_items, $offset);
-}
+
     $page_content = include_template('search.php', [
         'categories' => get_categories(),
         'lots' => $lots,
@@ -33,6 +33,7 @@ if ($search and count($errors) == 0) {
         'pages_count' => $pages_count,
         'cur_page' => $cur_page
     ]);
+}
 
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
