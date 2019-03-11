@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Функция-шаблонизатор.
+ *
+ * @param $name string имя файла шаблона
+ * @param $data array ассоциативный массив с данными для этого шаблона
+ *
+ * @return string итоговый HTML-код с подставленными данными
+ */
 function include_template($name, $data) {
     $name = $_SERVER['DOCUMENT_ROOT'] . '/templates/' . $name;
     $result = '';
@@ -17,6 +25,13 @@ function include_template($name, $data) {
     return $result;
 }
 
+/**
+ * Форматирует цену и обавляет знак рубля.
+ *
+ * @param $value int значение цены
+ *
+ * @return string отформатированное значение
+ */
 function formatting_price($value)
 {
     $value = ceil($value);
@@ -27,6 +42,13 @@ function formatting_price($value)
     return $value;
 }
 
+/**
+ * Вывоит сколько осталось времени в формате "количество дней ЧЧ:ММ".
+ *
+ * @param $dt_end string дата
+ *
+ * @return string отформатированное значение
+ */
 function lot_timer($dt_end)
 {
     $date_end = date_create($dt_end);

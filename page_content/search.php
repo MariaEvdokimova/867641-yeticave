@@ -7,16 +7,7 @@ $lots = array();
 $search = htmlspecialchars($_GET['search']);
 
 if ($search) {
-    $sql = "SELECT l.id_lot, l.lot_name, l.start_price, l.img_url, l.step_bet, c.category_name, l.end_datetime FROM lot l
-            JOIN categories c ON c.id_category = l.id_category
-            WHERE MATCH(l.lot_name, l.description) AGAINST(?)";
-    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-
+    $lots = lots_search($link, $search);
 }
 
 $page_content = include_template('search.php', [
