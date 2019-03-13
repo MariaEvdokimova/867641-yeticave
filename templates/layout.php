@@ -26,7 +26,7 @@
             <a class="main-header__add-lot button" href="/page_content/add.php">Добавить лот</a>
             <nav class="user-menu">
                 <!-- здесь должен быть PHP код для показа имени пользователя -->
-                <?php if ($is_auth == 1): ?>
+                <?php if ((isset($is_auth) ? $is_auth : 0) == 1): ?>
                     <ul class="user-menu__list">
                         <li class="user-menu__item"> <!--<div class="user-menu__logged">-->
                             <a href=""><?=$user_name; ?></a>
@@ -62,7 +62,7 @@
             <!--заполните этот список из массива категорий-->
             <?php foreach ($categories as $value): ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?=$value['category_name'];?></a>
+                    <a href="/page_content/all-lots.php?id=<?=$value['id_category'];?>"><?=isset($value['category_name']) ? $value['category_name'] : '';?></a>
                 </li>
             <?php endforeach; ?>
         </ul>

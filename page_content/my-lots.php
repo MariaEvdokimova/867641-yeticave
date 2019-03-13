@@ -1,9 +1,10 @@
 <?php
 
 require_once('../boot.php');
+$categories = get_categories();
 
 $page_content = include_template('my-lots.php', [
-    'categories' => get_categories()
+    'categories' => $categories
 ]);
 
 $layout_content = include_template('layout.php', [
@@ -11,7 +12,7 @@ $layout_content = include_template('layout.php', [
     'title' => 'Мои ставки',
     'is_auth' => $is_auth,
     'user_name' => $user_name,
-    'categories' => get_categories()
+    'categories' => $categories
 ]);
 
 print($layout_content);

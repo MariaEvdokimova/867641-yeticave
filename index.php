@@ -1,10 +1,12 @@
 <?php
 
 require_once('boot.php');
+$announcement_list = get_announcement_list();
+$categories = get_categories();
 
 $page_content = include_template('index.php', [
-    'categories' => get_categories(),
-    'announcement_list' => get_announcement_list()
+    'categories' => $categories,
+    'announcement_list' => $announcement_list
 ]);
 
 $layout_content = include_template('layout.php', [
@@ -12,7 +14,7 @@ $layout_content = include_template('layout.php', [
     'title' => 'Главная',
     'is_auth' => $is_auth,
     'user_name' => $user_name,
-    'categories' => get_categories()
+    'categories' => $categories
 ]);
 
 print($layout_content);

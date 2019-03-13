@@ -3,7 +3,7 @@
       <ul class="nav__list container">
           <?php foreach ($categories as $value): ?>
               <li class="nav__item">
-                  <a href="all-lots.html"><?=$value['category_name'];?></a>
+                  <a href="/page_content/all-lots.php?id=<?=$value['id_category'];?>"><?=isset($value['category_name']) ? $value['category_name'] : '';?></a>
               </li>
           <?php endforeach; ?>
       </ul>
@@ -41,7 +41,7 @@
         <?php $classname = isset($errors['avatar']) ? "form__item--invalid" : "";
         $value = isset($sign['avatar']) ? $sign['avatar'] : ""; ?>
       <div class="form__item form__item--file form__item--last <?=$classname;?>">
-        <span class="form__error">Загрузите картинку в формате png, jpeg или jpg.</span>
+        <span class="form__error"><?=$errors['avatar'];?></span>
         <label>Аватар</label>
         <div class="preview">
           <button class="preview__remove" type="button">x</button>

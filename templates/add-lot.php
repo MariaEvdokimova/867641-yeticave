@@ -3,12 +3,12 @@
       <ul class="nav__list container">
           <?php foreach ($categories as $value): ?>
               <li class="nav__item">
-                  <a href="all-lots.html"><?=$value['category_name'];?></a>
+                  <a href="/page_content/all-lots.php?id=<?=$value['id_category'];?>"><?=isset($value['category_name']) ? $value['category_name'] : '';?></a>
               </li>
           <?php endforeach; ?>
       </ul>
     </nav>
-    <form class="form form--add-lot container form--invalid" action="add.php" method="post" enctype = "multipart/form-data"> <!-- form--invalid -->
+    <form class="form form--add-lot container form--invalid" action="/page_content/add.php" method="post" enctype = "multipart/form-data"> <!-- form--invalid -->
       <h2>Добавление лота</h2>
       <div class="form__container-two">
           <?php $classname = isset($errors['lot_name']) ? "form__item--invalid" : "";
@@ -20,7 +20,7 @@
         </div>
           <?php $classname = isset($errors['id_category']) ? "form__item--invalid" : "";
             $value = (isset($lot['id_category']) and $lot['id_category'] != '') ? $lot['id_category'] : "";
-            $key = array_search($lot['id_category'], array_column($categories, 'id_category'));
+            $key = array_search($value, array_column($categories, 'id_category'));
             $category = $key ? $categories[$key]['category_name'] : "Выберите категорию";
           ?>
           <div class="form__item <?=$classname;?>">
@@ -28,7 +28,7 @@
           <select id="category" name="id_category" > <!--required-->
               <option value="<?=$value;?>" ><?=$category?></option>
               <?php foreach ($categories as $value): ?>
-                  <option value="<?=$value['id_category'] ?>"><?=$value['category_name'];?></option>
+                  <option value="<?=isset($value['id_category']) ? $value['id_category'] : 0; ?>"><?=isset($value['category_name']) ? $value['category_name'] : '';?></option>
               <?php endforeach; ?>
           </select>
           <span class="form__error"><?=$errors['id_category'];?></span>
@@ -44,7 +44,7 @@
         <?php $classname = isset($errors['img_url']) ? "form__item--invalid" : "";
         $value = isset($lot['img_url']) ? $lot['img_url'] : ""; ?>
       <div class="form__item form__item--file <?=$classname;?>"> <!-- form__item--uploaded -->
-          <span class="form__error">Загрузите картинку в формате png, jpeg или jpg.</span>
+          <span class="form__error"><?=$errors['img_url'];?></span>
          <label>Изображение</label>
          <div class="preview">
           <button class="preview__remove" type="button">x</button>
@@ -79,7 +79,7 @@
         <div class="form__item  <?=$classname;?>">
           <label for="lot-date">Дата окончания торгов</label>
           <input class="form__input-date" id="lot-date" type="text" name="lot_date" placeholder="ДД.ММ.ГГГГ" value="<?=$value;?>"> <!--required-->
-          <span class="form__error">Введите дату завершения торгов в формате ДД.ММ.ГГГГ</span>
+          <span class="form__error"><?=$errors['lot_date'];?></span>
         </div>
       </div>
         <?php if (!empty($errors)): ?>

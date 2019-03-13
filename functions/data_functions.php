@@ -19,9 +19,7 @@ function get_link()
         print($layout_content);
         exit(1);
     }
-    else {
-        return $link;
-    }
+    return $link;
 }
 
 /**
@@ -79,9 +77,6 @@ function get_lot_by_id($id)
             $lot = mysqli_fetch_array($result, MYSQLI_ASSOC);
             return $lot;
         }
-    }
-    else {
-        show_error('Ошибка подключения к базе', mysqli_error(get_link()));
     }
 }
 
@@ -163,10 +158,31 @@ function validate_number($value, $key, &$errors)
  */
 function validate_date($value, $key, &$errors)
 {
-    $format = 'd.m.Y';
-    $date = DateTime::createFromFormat($format, $value);
-    if (!($date && $date->format($format) == $value)) {
-        $errors[$key] = 'Это поле надо заполнить в формате d.m.Y';
+    if (empty($errors[$key])) {
+        $format = 'd.m.Y';
+        $date = DateTime::createFromFormat($format, $value);
+        if (!($date && $date->format($format) === $value)) {
+            $errors[$key] = 'Введите дату завершения торгов в формате ДД.ММ.ГГГГ';
+        }
+    }
+}
+
+/**
+ * Проверяет, что дата больше текущей минимум на сутки,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $arr array значение поля дата
+ * @param $key string ключ, имя поля дата
+ * @param $errors array() массив ошибок
+ */
+function actual_date($arr, $key, &$errors)
+{
+    if (empty($errors[$key])) {
+        $tomorrow = strtotime('tomorrow');
+        $lot_date = strtotime($arr[$key]);
+        if ($lot_date < $tomorrow){
+            $errors[$key] = 'Дата окончания должна быть больше текущей минимум на сутки';
+        }
     }
 }
 
@@ -189,7 +205,18 @@ function validate_img($key, &$errors)
             $errors[$key] = 'Загрузите картинку в формате png, jpeg или jpg.';
         }
       }
-    else {
+}
+
+/**
+ * Проверяет, загрузили файл или нет,
+ * если нет то записывает ошибуку в массив ошибок
+ *
+ * @param $key string ключ, имя поля с загруженным файлом
+ * @param $errors array() массив ошибок
+ */
+function available_img($key, &$errors)
+{
+    if (!(isset($_FILES[$key]['name']) and !empty($_FILES[$key]['name']))) {
         $errors[$key] = 'Это поле надо заполнить: загрузите картинку.';
     }
 }
@@ -199,14 +226,13 @@ function validate_img($key, &$errors)
  *
  * @param $file_dir string дирректоря
  *
- * @return string возвращает дирректорию
  */
 function create_directory($file_dir)
 {
     if (!file_exists($file_dir)) {
+        $file_dir = ROOT_DIR . $file_dir;
         mkdir($file_dir, 0777, true);
     }
-    return $file_dir;
 }
 
 /**
@@ -223,7 +249,7 @@ function change_filename($key, $file_dir)
     $path = $_FILES[$key]['name'];
     $filename = uniqid() . '.' . pathinfo($path, PATHINFO_EXTENSION);
     $arr[$key] = $filename;
-    move_uploaded_file($tmp_name, $file_dir . '/' . $filename);
+    move_uploaded_file($tmp_name, ROOT_DIR . $file_dir . '/' . $filename);
     $arr[$key] = $file_dir . '/' . $filename;
     return $arr[$key];
 }
@@ -326,7 +352,7 @@ function create_user($arr, $link)
 /**
  * Обнавляет данные аватара пользователя в базе
  *
- * @param $avatar string значение пути и имени файла аватара
+ * @param $avatar array значение пути и имени файла аватара
  * @param $id_user int идентификатор пользователя
  * @param $link mysqli Ресурс соединения
  */
@@ -341,7 +367,7 @@ function update_user_avatar($avatar, $id_user, $link)
  * то записывает ошибуку в массив ошибок
  *
  * @param $key string ключ для записи ошибки
- * @param $value string значение пользователя
+ * @param $value array значение пользователя
  * @param $errors array() массив ошибок
  */
 function validate_user($key, $value, &$errors)
@@ -373,12 +399,16 @@ function available_password($form_pas, $user_pas, &$errors)
  * @param $form_cost int введеная значение
  * @param $start_price int начальная цена
  * @param $step_bet int ставка
+ * @param $max_bet int максимальная ставка
  * @param $errors array() массив ошибок
  */
-function validate_sum_bet($form_cost, $start_price, $step_bet, &$errors)
+function validate_sum_bet($form_cost, $start_price, $step_bet, $max_bet, &$errors)
 {
-    if(empty($errors['cost']) and $form_cost <= $start_price + $step_bet){
-        $errors['cost'] = 'Значение должно быть больше, чем текущая цена лота + шаг ставки';
+    if(empty($errors['cost'])){
+        $current_price = empty($max_bet) ? $start_price : $max_bet;
+        if($form_cost < $current_price + $step_bet) {
+            $errors['cost'] = 'Значение должно быть больше, чем текущая цена + шаг ставки';
+        }
     }
 }
 
@@ -433,7 +463,7 @@ function user_is_bet($arr, $id_user)
 {
     foreach ($arr as $value)
     {
-        if($id_user == $value['id_user']){
+        if($id_user === $value['id_user']){
             return true;
         }
     }
@@ -548,15 +578,61 @@ function lots_search($link, $search, $page_items, $offset)
 }
 
 /**
- * Получает количество актуальных лотов.
+ * Получает количество лотов по запросу.
  *
  * @param $link mysqli Ресурс соединения
+ * @param $search string данные из поля поиска
  *
  * @return int количество лотов
  */
-function get_count_lots($link)
+function get_count_lots($link, $search)
 {
-    $result = mysqli_query($link, "SELECT COUNT(*) as cnt FROM lot WHERE end_datetime > NOW()");
+    $sql = "SELECT COUNT(*) as cnt FROM lot l WHERE MATCH(l.lot_name, l.description) AGAINST(?) AND l.end_datetime > NOW()";
+    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $items_count = mysqli_fetch_assoc($result)['cnt'];
+
+    return $items_count;
+}
+
+/**
+ * Получает список лотов по категории
+ *
+ * @param $id int идентификатор категории
+ * @param $page_items int количество лотов на странице
+ * @param $offset int указатель с какого момента считывать данные из базы
+ *
+ * @return array() массив лотов или ошибка
+ */
+function get_lot_by_category($id, $page_items, $offset)
+{
+    $sql = "SELECT l.id_lot, l.lot_name, l.start_price, l.img_url, l.step_bet, c.category_name, l.id_category, l.end_datetime
+        FROM lot l LEFT JOIN categories c ON l.id_category = c.id_category
+        WHERE l.end_datetime > NOW() AND l.id_category = '%s' ORDER BY l.creation_date DESC 
+        LIMIT {$page_items} OFFSET {$offset}";
+    $sql = sprintf($sql, $id);
+
+    if ($result = mysqli_query(get_link(), $sql)) {
+
+        $lot = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $lot;
+    }
+}
+
+/**
+ * Получает количество актуальных лотов для категории.
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $id int идентификатор категории
+ *
+ * @return int количество лотов
+ */
+function count_lots_by_category($link, $id)
+{
+    $sql = "SELECT COUNT(*) as cnt FROM lot l WHERE l.end_datetime > NOW() AND l.id_category = '%s'";
+    $sql = sprintf($sql, $id);
+    $result = mysqli_query($link, $sql);
     $items_count = mysqli_fetch_assoc($result)['cnt'];
 
     return $items_count;
