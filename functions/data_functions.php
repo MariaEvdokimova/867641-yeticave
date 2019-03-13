@@ -73,10 +73,8 @@ function get_lot_by_id($id)
             print($content);
             exit(1);
         }
-        else {
-            $lot = mysqli_fetch_array($result, MYSQLI_ASSOC);
-            return $lot;
-        }
+        $lot = mysqli_fetch_array($result, MYSQLI_ASSOC);
+        return $lot;
     }
 }
 
