@@ -1,0 +1,14 @@
+{
+    "name": "maria/yeticave",
+    "description": "Website for lots",
+    "type": "project",
+    "authors": [
+        {
+            "name": "MariaEvdokimova",
+            "email": "e.marrri@mail.ru"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}

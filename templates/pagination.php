@@ -4,7 +4,7 @@
         <?php foreach ($pages as $page): ?>
 
             <li class="pagination-item <?php if ($page === $cur_page): ?>pagination-item-active<?php endif; ?>">
-                <a href="<?=$url;?>&page=<?=$page;?>"><?=$page;?></a>
+                <a href="<?=isset($url) ? $url : '';?>&page=<?=$page;?>"><?=$page;?></a>
             </li>
         <?php endforeach; ?>
         <li class="pagination-item pagination-item-next"><a href="#">Вперед</a></li>

@@ -15,11 +15,6 @@ $pages = range(1, $pages_count);
 
 $lots = get_lot_by_category($id, $page_items, $offset);
 
-if (!$lots) {
-    print_mysql_err($link);
-
-}
-
 $page_content = include_template('all-lots.php', [
     'categories' => $categories,
     'lots' => $lots,

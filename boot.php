@@ -12,9 +12,11 @@ if (isset($_SESSION['user'])) {
 date_default_timezone_set("Europe/Moscow");
 setlocale(LC_ALL, 'ru_RU');
 
-require_once('functions/functions.php');
+//подключаем Composer
+require_once ('vendor/autoload.php');
+require_once ('functions/functions.php');
 require_once ('functions/data_functions.php');
-require_once('functions/mysql_helper.php');
+require_once ('functions/mysql_helper.php');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

@@ -11,7 +11,7 @@
     <div class="container">
       <section class="lots">
           <?php $first = reset($lots);
-          $category_name = isset($first['category_name']) ? $first['category_name'] : 0;
+          $category_name = isset($first['category_name']) ? $first['category_name'] : 'Нет лотов в данной категори';
           ?>
         <h2>Все лоты в категории <span>«<?=$category_name;?>»</span></h2>
         <ul class="lots__list">

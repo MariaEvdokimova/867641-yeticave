@@ -635,3 +635,63 @@ function count_lots_by_category($link, $id)
 
     return $items_count;
 }
+
+/**
+ * Получает список новых победителей
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array() информация о победителях
+ */
+function get_winner($link)
+{
+    $sql = "SELECT b1.id_user, b1.id_lot, b2.max_bet, u.email, u.name, l.lot_name
+            FROM bet b1
+            INNER JOIN lot l ON l.id_lot = b1.id_lot AND l.id_winner IS NULL AND l.end_datetime <= NOW()
+            INNER JOIN (
+                SELECT id_lot, MAX(sum_bet) as max_bet
+                FROM bet b
+                WHERE b.id_lot
+                GROUP BY id_lot
+            ) b2 ON b1.id_lot = b2.id_lot AND b1.sum_bet = b2.max_bet
+            LEFT JOIN users u ON u.id_user = b1.id_user";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_all($res, MYSQLI_ASSOC);
+
+    return $res;
+}
+
+/**
+ * Обнавляет данные, записывает победителя в таблице lot
+ *
+ * @param $id_winner int идентификатор победителя
+ * @param $id_lot int идентификатор лота
+ * @param $link mysqli Ресурс соединения
+ */
+function update_winner_lot($id_winner, $id_lot, $link)
+{
+    $sql = "UPDATE lot l SET l.id_winner = {$id_winner} WHERE l.id_lot = {$id_lot}";
+    mysqli_query($link, $sql);
+}
+
+/**
+ * Получает ставки пользователя на различные лоты.
+ *
+ * @param $id_user int идентификатор лота
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array() ставки пользователя
+ */
+function get_bet_by_user($id_user, $link)
+{
+    $sql = "SELECT l.id_lot, l.lot_name, c.category_name, l.end_datetime, b.sum_bet, b.creation_date, l.img_url, l.id_winner
+FROM bet b
+INNER JOIN lot l ON l.id_lot = b.id_lot
+INNER JOIN categories c ON c.id_category = l.id_category
+WHERE b.id_user = {$id_user} 
+ORDER BY l.end_datetime DESC";
+    $res = mysqli_query($link, $sql);
+    $res = mysqli_fetch_all($res, MYSQLI_ASSOC);
+
+    return $res;
+}

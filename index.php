@@ -1,6 +1,8 @@
 <?php
 
 require_once('boot.php');
+require_once ('page_content/getwinner.php');
+
 $announcement_list = get_announcement_list();
 $categories = get_categories();
 
